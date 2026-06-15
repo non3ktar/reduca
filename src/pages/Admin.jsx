@@ -62,15 +62,18 @@ export default function Admin({ user }) {
         <div className="glass-card p-6 border-orange-500/30">
           <h2 className="text-xl font-bold text-black mb-4">Seus Widgets Globais</h2>
           <p className="text-slate-400 text-sm mb-4">Os widgets criados por você no Marketplace servem como base para a plataforma.</p>
-          <div className="space-y-3">
+          <div className="space-y-3 mb-6">
             {globalWidgets.map(w => (
-              <div key={w.id} className="flex items-center justify-between bg-slate-900/50 p-3 rounded-xl border border-slate-700/50">
-                <span className="text-sm font-bold text-slate-200">{w.title}</span>
-                <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-md">Global</span>
+              <div key={w.id} className="flex items-center justify-between bg-white/50 p-3 rounded-xl border border-black/10">
+                <span className="text-sm font-bold text-black">{w.title}</span>
+                <span className="text-xs px-2 py-1 bg-red-500/20 text-red-600 font-bold rounded-md">Global</span>
               </div>
             ))}
-            {globalWidgets.length === 0 && <p className="text-xs text-slate-500">Nenhum widget criado ainda.</p>}
+            {globalWidgets.length === 0 && <p className="text-xs text-slate-500">Nenhum widget criado ainda na Nuvem.</p>}
           </div>
+          <button onClick={() => navigate('/marketplace')} className="w-full bg-black hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl transition shadow-lg">
+            Ir para o Marketplace
+          </button>
         </div>
       </div>
     </div>
