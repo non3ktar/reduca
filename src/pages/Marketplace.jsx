@@ -10,15 +10,29 @@ export default function Marketplace({ user }) {
   const [activeWidgets, setActiveWidgets] = useState(['quem-seguir']);
   const [customWidgets, setCustomWidgets] = useState([]);
 
-  useEffect(() => {
-    supabase.from('user_settings').select('active_widgets').eq('user_id', user.id).single().then(({ data }) => {
-      if (data && data.active_widgets) setActiveWidgets(data.active_widgets);
-    });
+  const [isAdmin, setIsAdmin] = useState(false);
 
-    supabase.from('custom_widgets').select('*').eq('user_id', user.id).then(({ data }) => {
-      if (data) setCustomWidgets(data);
+  useEffect(() => {
+    supabase.from('profiles').select('is_admin').eq('id', user.id).single().then(({ data }) => {
+      if (data && data.is_admin) {
+        setIsAdmin(true);
+        // Only load data if admin
+        supabase.from('user_settings').select('active_widgets').eq('user_id', user.id).single().then(({ data: settings }) => {
+          if (settings && settings.active_widgets) setActiveWidgets(settings.active_widgets);
+        });
+
+        supabase.from('custom_widgets').select('*').eq('user_id', user.id).then(({ data: customData }) => {
+          if (customData) setCustomWidgets(customData);
+        });
+      } else {
+        navigate('/'); // Redirect non-admins back to feed
+      }
     });
-  }, [user.id]);
+  }, [user.id, navigate]);
+
+  if (!isAdmin) {
+    return <div className="min-h-screen pt-20 text-center text-slate-500">Verificando permissões...</div>;
+  }
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWidget, setEditingWidget] = useState(null);
