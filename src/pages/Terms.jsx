@@ -17,7 +17,7 @@ export default function Terms() {
         </div>
       </div>
 
-      <div className="space-y-6 text-slate-800 leading-relaxed font-light">
+      <div className="space-y-6 text-black leading-relaxed font-light">
         <section>
           <h2 className="text-xl font-bold mb-3">1. Aceitação dos Termos</h2>
           <p>
