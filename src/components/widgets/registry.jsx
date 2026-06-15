@@ -7,8 +7,10 @@ import WidgetConquistas from './WidgetConquistas';
 import WidgetMetas from './WidgetMetas';
 import WidgetAtalhos from './WidgetAtalhos';
 import WidgetEnquetes from './WidgetEnquetes';
+import WidgetChat from './WidgetChat';
 
 export const availableWidgets = [
+  { id: 'chat', name: 'Chat Global', description: 'Sala de bate-papo em tempo real com todos da plataforma.', component: WidgetChat },
   { id: 'quem-seguir', name: 'Sugestões de Amizade', description: 'Usuários sugeridos para seguir baseados na sua rede.', component: WidgetQuemSeguir },
   { id: 'trending', name: 'Tópicos em Alta', description: 'As disciplinas e hashtags mais discutidas no momento.', component: WidgetTrending },
   { id: 'aniversarios', name: 'Aniversariantes', description: 'Veja quais colegas estão apagando as velinhas hoje.', component: WidgetAniversarios },
