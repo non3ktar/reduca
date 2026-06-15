@@ -10,7 +10,7 @@ import WidgetNoticias from './widgets/WidgetNoticias';
 import { AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-export default function Sidebar({ currentUser }) {
+export default function Sidebar({ currentUser, className = 'hidden md:block' }) {
   const [activeWidgets, setActiveWidgets] = useState(['quem-seguir']);
   const [customWidgets, setCustomWidgets] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -53,7 +53,7 @@ export default function Sidebar({ currentUser }) {
   }, [currentUser]);
 
   return (
-    <aside className="hidden md:block sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar space-y-6 pb-6">
+    <aside className={`sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar space-y-6 pb-6 ${className}`}>
       <WidgetCalendario currentUser={currentUser} isAdmin={isAdmin} />
       <WidgetNoticias currentUser={currentUser} isAdmin={isAdmin} />
       <WidgetAvisos />

@@ -8,13 +8,14 @@ import WidgetMembros from '../components/widgets/WidgetMembros';
 import WidgetQuemSeguir from '../components/widgets/WidgetQuemSeguir';
 import WidgetAniversarios from '../components/widgets/WidgetAniversarios';
 import WidgetVideoDestaque from '../components/widgets/WidgetVideoDestaque';
-import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck } from 'lucide-react';
+import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Home({ user }) {
   const [userData, setUserData] = useState(null);
   const [showMsg, setShowMsg] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
+  const [mobileTab, setMobileTab] = useState('feed');
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -96,14 +97,14 @@ export default function Home({ user }) {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-[minmax(0,600px)_320px] lg:grid-cols-[280px_minmax(0,600px)_320px] justify-center gap-6">
-        {/* Left Sidebar (Desktop Only) */}
-        <aside className="hidden lg:block sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar space-y-6 pb-6">
+        {/* Left Sidebar (Desktop & Mobile "pessoas" tab) */}
+        <aside className={`lg:block sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar space-y-6 pb-6 ${mobileTab === 'pessoas' ? 'block' : 'hidden'}`}>
           <WidgetMembros />
           <WidgetQuemSeguir currentUser={userData} isAdmin={userData?.is_admin} />
           <WidgetAniversarios currentUser={userData} isAdmin={userData?.is_admin} />
         </aside>
 
-        <div className="space-y-6">
+        <div className={`space-y-6 ${mobileTab === 'feed' ? 'block' : 'hidden'} md:block`}>
           <div className="md:hidden flex justify-between items-center mb-6 glass-card p-4">
              <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition">
                 <img src={userData.avatar} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-orange-500" />
@@ -139,25 +140,33 @@ export default function Home({ user }) {
         </div>
 
         {/* Sidebar */}
-        <Sidebar currentUser={user} />
+        <Sidebar currentUser={user} className={`md:block ${mobileTab === 'estudos' ? 'block' : 'hidden'}`} />
       </main>
 
       {/* Bottom Nav Mobile */}
-      <nav className="fixed bottom-0 w-full glass z-50 md:hidden pb-safe">
-        <div className="flex items-center justify-around h-16 relative">
-          <Link to="/" className="text-orange-500"><HomeIcon size={24} /></Link>
-          <Link to="/blog" className="text-slate-400"><BookOpen size={24} /></Link>
-          
-          <button onClick={() => {setShowMsg(!showMsg); setShowNotif(false)}} className="text-slate-400 relative">
-            <MessageCircle size={24} />
-          </button>
-          
-          <button onClick={() => {setShowNotif(!showNotif); setShowMsg(false)}} className="text-slate-400 relative">
-            <Bell size={24} />
+      <nav className="fixed bottom-0 w-full glass z-50 md:hidden pb-safe border-t border-slate-800/50">
+        <div className="flex items-center justify-around h-16 relative px-2">
+          <button onClick={() => setMobileTab('feed')} className={`flex flex-col items-center justify-center w-full h-full transition-colors ${mobileTab === 'feed' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-300'}`}>
+            <HomeIcon size={22} className={mobileTab === 'feed' ? 'drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]' : ''} />
+            <span className="text-[10px] mt-1 font-medium">Feed</span>
           </button>
 
-          {showMsg && <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-48 p-3 glass-card text-sm text-slate-300 text-center">Nenhuma mensagem nova</div>}
-          {showNotif && <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-48 p-3 glass-card text-sm text-slate-300 text-center">Sem notificações no momento</div>}
+          <button onClick={() => setMobileTab('pessoas')} className={`flex flex-col items-center justify-center w-full h-full transition-colors ${mobileTab === 'pessoas' ? 'text-emerald-500' : 'text-slate-400 hover:text-slate-300'}`}>
+            <Users size={22} className={mobileTab === 'pessoas' ? 'drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]' : ''} />
+            <span className="text-[10px] mt-1 font-medium">Rede</span>
+          </button>
+
+          <button onClick={() => setMobileTab('estudos')} className={`flex flex-col items-center justify-center w-full h-full transition-colors ${mobileTab === 'estudos' ? 'text-blue-500' : 'text-slate-400 hover:text-slate-300'}`}>
+            <CalendarDays size={22} className={mobileTab === 'estudos' ? 'drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]' : ''} />
+            <span className="text-[10px] mt-1 font-medium">Escola</span>
+          </button>
+          
+          <button onClick={() => {setShowNotif(!showNotif); setShowMsg(false)}} className="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-slate-300 relative transition-colors">
+            <Bell size={22} />
+            <span className="text-[10px] mt-1 font-medium">Notific.</span>
+          </button>
+
+          {showNotif && <div className="absolute bottom-16 right-4 w-48 p-3 glass-card text-sm text-slate-300 text-center shadow-xl">Sem notificações no momento</div>}
         </div>
       </nav>
     </div>
