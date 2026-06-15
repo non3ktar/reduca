@@ -72,7 +72,7 @@ export default function Login() {
         playsInline 
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
       >
-        <source src="https://con3ktar.nekoweb.org/23087-333074572.mp4" type="video/mp4" />
+        <source src="https://con3ktar.nekoweb.org/23087-333074572comp2.mp4" type="video/mp4" />
       </video>
       
       {/* Dark Overlay for better contrast over the video */}
