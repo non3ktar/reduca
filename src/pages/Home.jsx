@@ -85,7 +85,7 @@ export default function Home({ user }) {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8">
+      <main className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-[minmax(0,600px)_320px] justify-center gap-8">
         <div className="space-y-6">
           <div className="md:hidden flex justify-between items-center mb-6 glass-card p-4">
              <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition">

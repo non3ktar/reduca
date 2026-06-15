@@ -54,8 +54,8 @@ export default function Profile({ currentUser }) {
   if (profileUser === null) return <div className="min-h-screen flex items-center justify-center text-slate-400">Usuário não encontrado.</div>;
 
   return (
-    <div className="min-h-screen pb-20 pt-6 px-4 md:px-12 max-w-4xl mx-auto relative">
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition glass px-4 py-2 rounded-full w-fit">
+    <div className="min-h-screen pb-20 pt-6 px-4 md:px-12 max-w-2xl mx-auto relative">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-400 hover:text-black mb-6 transition glass px-4 py-2 rounded-full w-fit">
         <ArrowLeft size={18} /> Voltar
       </button>
 
