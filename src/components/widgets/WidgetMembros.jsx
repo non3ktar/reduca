@@ -12,7 +12,7 @@ export default function WidgetMembros() {
       const { data } = await supabase
         .from('profiles')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('name', { ascending: true });
         
       if (data) {
         setMembers(data);
