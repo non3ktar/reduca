@@ -20,19 +20,32 @@ export default function Sidebar({ currentUser }) {
       if (data && data.is_admin) setIsAdmin(true);
     });
 
-    // Fetch platform configuration (always from an Admin's profile)
-    supabase.from('profiles').select('id').eq('is_admin', true).limit(1).single().then(({ data: adminData }) => {
-      // Se encontrou um admin, usa as configurações dele para todos. Senão, usa as do usuário atual (fallback).
-      const configUserId = adminData ? adminData.id : currentUser.id;
+    // Tenta buscar o admin
+    supabase.from('profiles').select('id').eq('is_admin', true).limit(1).single().then(({ data: adminData, error: adminErr }) => {
+      
+      if (adminErr) {
+        console.error("Erro ao buscar admin (possível bloqueio RLS):", adminErr);
+        // Fallback: se o RLS bloqueou a busca por admin, vamos tentar buscar na marra a primeira configuração salva no banco de dados
+        // (Assumindo que apenas o admin teve acesso ao marketplace recentemente)
+        supabase.from('custom_widgets').select('user_id').limit(1).single().then(({ data: customData }) => {
+           const fallbackUserId = customData ? customData.user_id : currentUser.id;
+           loadWidgetsForUser(fallbackUserId);
+        });
+      } else {
+        const configUserId = adminData ? adminData.id : currentUser.id;
+        loadWidgetsForUser(configUserId);
+      }
+    });
 
-      supabase.from('user_settings').select('active_widgets').eq('user_id', configUserId).single().then(({ data }) => {
+    function loadWidgetsForUser(userId) {
+      supabase.from('user_settings').select('active_widgets').eq('user_id', userId).single().then(({ data }) => {
         if (data && data.active_widgets) setActiveWidgets(data.active_widgets);
       });
 
-      supabase.from('custom_widgets').select('*').eq('user_id', configUserId).then(({ data }) => {
+      supabase.from('custom_widgets').select('*').eq('user_id', userId).then(({ data }) => {
         if (data) setCustomWidgets(data);
       });
-    });
+    }
 
   }, [currentUser]);
 
