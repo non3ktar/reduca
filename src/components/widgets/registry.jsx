@@ -11,8 +11,10 @@ import WidgetChat from './WidgetChat';
 import WidgetLinks from './WidgetLinks';
 import WidgetArtigos from './WidgetArtigos';
 import WidgetCalendario from './WidgetCalendario';
+import WidgetAvisos from './WidgetAvisos';
 
 export const availableWidgets = [
+  { id: 'avisos', name: 'Mural de Avisos', description: 'Transmite notificações em massa de administradores.', component: WidgetAvisos },
   { id: 'chat', name: 'Chat Global', description: 'Sala de bate-papo em tempo real com todos da plataforma.', component: WidgetChat },
   { id: 'quem-seguir', name: 'Sugestões de Amizade', description: 'Usuários sugeridos para seguir baseados na sua rede.', component: WidgetQuemSeguir },
   { id: 'trending', name: 'Tópicos em Alta', description: 'As disciplinas e hashtags mais discutidas no momento.', component: WidgetTrending },

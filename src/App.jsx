@@ -8,6 +8,7 @@ import Admin from './pages/Admin';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Blog from './pages/Blog';
+import ScrollToTop from './components/ScrollToTop';
 import { supabase } from './supabase';
 
 export default function App() {
@@ -41,6 +42,7 @@ export default function App() {
 
   return (
     <Router basename="/reduc">
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={session ? <Navigate to="/" /> : <Login />} />
         <Route path="/terms" element={<Terms />} />

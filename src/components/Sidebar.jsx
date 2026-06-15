@@ -4,6 +4,7 @@ import { availableWidgets } from './widgets/registry';
 import WidgetCustom from './widgets/WidgetCustom';
 import WidgetArtigos from './widgets/WidgetArtigos';
 import WidgetCalendario from './widgets/WidgetCalendario';
+import WidgetAvisos from './widgets/WidgetAvisos';
 import { AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -51,6 +52,7 @@ export default function Sidebar({ currentUser }) {
 
   return (
     <aside className="space-y-6 hidden md:block">
+      <WidgetAvisos />
       <WidgetCalendario currentUser={currentUser} isAdmin={isAdmin} />
       <WidgetArtigos isAdmin={isAdmin} />
       <AnimatePresence>
