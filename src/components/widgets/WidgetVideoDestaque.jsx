@@ -149,7 +149,7 @@ export default function WidgetVideoDestaque({ currentUser, isAdmin }) {
             {videoId ? (
               <div className="relative aspect-video w-full rounded-lg md:rounded-xl overflow-hidden shadow-inner bg-black">
                 <iframe 
-                  src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`}
                   title="Vídeo em Destaque"
                   className="absolute top-0 left-0 w-full h-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
