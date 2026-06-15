@@ -1,21 +1,110 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, Send } from 'lucide-react';
+import { supabase } from '../../supabase';
 
-export default function WidgetDuvidas() {
+export default function WidgetDuvidas({ currentUser, isAdmin }) {
+  const [questions, setQuestions] = useState([]);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    fetchQuestions();
+    
+    if (!error) {
+      const channel = supabase.channel('questions_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'questions' }, fetchQuestions)
+        .subscribe();
+      return () => supabase.removeChannel(channel);
+    }
+  }, [error]);
+
+  const fetchQuestions = async () => {
+    try {
+      const { data, error: fetchErr } = await supabase.from('questions').select('*').order('created_at', { ascending: false }).limit(5);
+      if (fetchErr) throw fetchErr;
+      if (data) {
+        setQuestions(data);
+        setError(false);
+      }
+    } catch (err) {
+      setError(true);
+    }
+  };
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (!newQuestion.trim() || !currentUser) return;
+    
+    const { data: profile } = await supabase.from('profiles').select('name').eq('id', currentUser.id).single();
+    const userName = profile?.name || currentUser.email.split('@')[0];
+
+    await supabase.from('questions').insert([{
+      user_id: currentUser.id,
+      user_name: userName,
+      text: newQuestion
+    }]);
+    
+    setNewQuestion('');
+  };
+
+  if (error) {
+    return (
+      <motion.div layout className="glass-card p-5 relative overflow-hidden border border-red-500/30">
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <HelpCircle size={16} className="text-blue-500" /> Mural de Dúvidas
+        </h3>
+        {isAdmin ? (
+          <div className="bg-red-500/10 p-3 rounded-xl">
+            <p className="text-xs text-red-400 font-bold mb-2">Configure o Banco (Admin)</p>
+            <p className="text-[10px] text-slate-300 mb-2">Para este widget funcionar, rode no SQL Editor do Supabase:</p>
+            <code className="block text-[9px] bg-slate-900 p-2 rounded text-slate-400 font-mono whitespace-pre-wrap">
+              create table questions (id uuid default gen_random_uuid() primary key, user_id uuid references auth.users(id), user_name text, text text, created_at timestamp default now());
+              alter table questions enable row level security;
+              create policy "all" on questions for select using (true);
+              create policy "auth" on questions for insert with check (auth.role() = 'authenticated');
+            </code>
+          </div>
+        ) : (
+           <p className="text-xs text-slate-500 text-center">Em manutenção...</p>
+        )}
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="glass-card p-5 relative overflow-hidden">
       <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
         <HelpCircle size={16} className="text-blue-500" /> Mural de Dúvidas
       </h3>
-      <div className="space-y-3">
-        <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700 hover:border-blue-500/50 cursor-pointer transition-colors">
-          <p className="text-sm text-slate-300 font-medium mb-2">"Como aplicar metodologias ativas no ensino remoto?"</p>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-            <span className="w-4 h-4 rounded-full bg-slate-700 block"></span> Carlos · 0 respostas
-          </div>
-        </div>
+      
+      <div className="space-y-3 mb-4 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+        {questions.length === 0 ? (
+          <p className="text-xs text-slate-500 text-center py-2">Nenhuma dúvida ainda. Pergunte algo!</p>
+        ) : (
+          questions.map(q => (
+            <div key={q.id} className="bg-slate-800/50 p-3 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-colors">
+              <p className="text-sm text-slate-200 font-medium mb-2 leading-tight">"{q.text}"</p>
+              <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-wide">
+                <span className="w-2 h-2 rounded-full bg-blue-500 block"></span> {q.user_name}
+              </div>
+            </div>
+          ))
+        )}
       </div>
+
+      <form onSubmit={handleSend} className="flex gap-2">
+        <input 
+          type="text" 
+          value={newQuestion}
+          onChange={e => setNewQuestion(e.target.value)}
+          placeholder="Qual a sua dúvida?"
+          className="flex-1 min-w-0 glass-input !py-2 !px-3 text-xs"
+        />
+        <button type="submit" disabled={!newQuestion.trim()} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white p-2 rounded-xl transition-colors shrink-0">
+          <Send size={14} />
+        </button>
+      </form>
     </motion.div>
   );
 }

@@ -33,13 +33,13 @@ export default function Sidebar({ currentUser }) {
   return (
     <aside className="space-y-6 hidden md:block">
       <WidgetCalendario currentUser={currentUser} isAdmin={isAdmin} />
-      <WidgetArtigos />
+      <WidgetArtigos isAdmin={isAdmin} />
       <AnimatePresence>
         {activeWidgets.map(widgetId => {
           const WidgetDefinition = availableWidgets.find(w => w.id === widgetId);
           if (WidgetDefinition) {
             const WidgetComponent = WidgetDefinition.component;
-            return <WidgetComponent key={widgetId} currentUser={currentUser} />;
+            return <WidgetComponent key={widgetId} currentUser={currentUser} isAdmin={isAdmin} />;
           }
           
           const customWidget = customWidgets?.find(cw => cw.id === widgetId);
