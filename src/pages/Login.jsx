@@ -43,8 +43,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/20 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/20 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-black/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-black/5 rounded-full blur-[120px] pointer-events-none"></div>
       
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-8 md:p-12 w-full max-w-md relative z-10 border border-slate-700/50 shadow-2xl">
         <div className="text-center mb-8">
@@ -83,6 +83,13 @@ export default function Login() {
           </button>
         </div>
       </motion.div>
+
+      {/* Footer Genérico */}
+      <div className="absolute bottom-4 left-0 w-full text-center text-xs text-slate-500 z-10 flex justify-center gap-4">
+        <a href="#" className="hover:text-slate-800 transition-colors">Termos de Uso</a>
+        <span>&bull;</span>
+        <a href="#" className="hover:text-slate-800 transition-colors">Política de Privacidade</a>
+      </div>
     </div>
   );
 }

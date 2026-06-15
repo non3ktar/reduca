@@ -1,25 +1,42 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #f97316;
-  --color-background: #0f172a;
+  /* Invert Slate to match Cream/Black theme */
+  --color-slate-950: #FFFDF2;
+  --color-slate-900: #FFFDF2;
+  --color-slate-800: #fdfbf0;
+  --color-slate-700: #e5e5e5;
+  --color-slate-600: #a3a3a3;
+  --color-slate-500: #737373;
+  --color-slate-400: #404040;
+  --color-slate-300: #262626;
+  --color-slate-200: #171717;
+  --color-slate-100: #0a0a0a;
+  --color-slate-50: #000000;
+
+  /* Turn Orange into Black for accents */
+  --color-orange-300: #404040;
+  --color-orange-400: #262626;
+  --color-orange-500: #000000;
+  --color-orange-600: #000000;
 }
 
 @layer base {
   body {
-    @apply bg-slate-900 text-slate-100 antialiased min-h-screen;
-    background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
+    background-color: #FFFDF2;
+    color: #000000;
+    @apply antialiased min-h-screen;
   }
 }
 
 .glass {
-  @apply bg-slate-800/40 backdrop-blur-md border border-slate-700/50 shadow-xl;
+  @apply bg-white/50 backdrop-blur-md border border-black/5 shadow-sm;
 }
 
 .glass-card {
-  @apply bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl;
+  @apply bg-white/70 backdrop-blur-xl border border-black/10 rounded-2xl shadow-lg;
 }
 
 .glass-input {
-  @apply bg-slate-900/50 border border-slate-700/50 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all;
+  @apply bg-white/60 border border-black/20 rounded-xl px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-black transition-all;
 }
