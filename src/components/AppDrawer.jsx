@@ -44,7 +44,7 @@ export default function AppDrawer() {
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
             className="absolute w-[320px] bg-[var(--bg-color)] p-4 shadow-2xl z-50 border border-slate-700/50 rounded-2xl transition-colors duration-300 origin-top-right"
-            style={{ right: '-56px', top: '56px' }}
+            style={{ right: '-64px', top: '56px' }}
           >
             <h3 className="text-sm font-bold text-slate-300 mb-4 px-2">Apps da Reduca</h3>
             
