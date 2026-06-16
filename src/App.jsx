@@ -44,7 +44,7 @@ export default function App() {
 
   if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-orange-500 font-bold">Carregando Reduc...</div>;
 
-  const routerBasename = Capacitor.isNativePlatform() ? "" : "/reduc";
+  const routerBasename = Capacitor.isNativePlatform() ? "" : "/reduca";
 
   return (
     <Router basename={routerBasename}>
