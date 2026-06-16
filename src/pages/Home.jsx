@@ -10,6 +10,7 @@ import WidgetAniversarios from '../components/widgets/WidgetAniversarios';
 import WidgetVideoDestaque from '../components/widgets/WidgetVideoDestaque';
 import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import AppDrawer from '../components/AppDrawer';
 
 export default function Home({ user }) {
   const [userData, setUserData] = useState(null);
@@ -87,6 +88,7 @@ export default function Home({ user }) {
                 </span>
                 <img src={userData.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-orange-500/50 group-hover:border-orange-500" />
               </Link>
+              <AppDrawer />
               <ThemeToggle />
               <button onClick={handleLogout} className="text-red-400 hover:text-red-300 ml-2" title="Sair">
                 <LogOut size={20} />

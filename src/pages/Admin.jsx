@@ -13,6 +13,9 @@ export default function Admin({ user }) {
   // Dados
   const [globalWidgets, setGlobalWidgets] = useState([]);
   const [usersList, setUsersList] = useState([]);
+  const [ecosystemApps, setEcosystemApps] = useState([]);
+  const [showAppModal, setShowAppModal] = useState(false);
+  const [newApp, setNewApp] = useState({ name: '', description: '', icon_url: '', link_web: '', link_apk: '', link_desktop: '' });
 
   // Modal de Widgets
   const [showWidgetModal, setShowWidgetModal] = useState(false);
@@ -25,6 +28,7 @@ export default function Admin({ user }) {
         setIsAdmin(true);
         fetchGlobalWidgets();
         fetchUsers();
+        fetchEcosystemApps();
       }
       setLoading(false);
     });
@@ -38,6 +42,39 @@ export default function Admin({ user }) {
   const fetchUsers = async () => {
     const { data } = await supabase.from('profiles').select('*').order('name');
     if (data) setUsersList(data);
+  };
+
+  const fetchEcosystemApps = async () => {
+    const { data } = await supabase.from('ecosystem_apps').select('*').order('created_at', { ascending: true });
+    if (data) setEcosystemApps(data);
+  };
+
+  const handleCreateApp = async (e) => {
+    e.preventDefault();
+    if(!newApp.name || !newApp.icon_url) return;
+    
+    const { error } = await supabase.from('ecosystem_apps').insert({
+      name: newApp.name,
+      description: newApp.description,
+      icon_url: newApp.icon_url,
+      link_web: newApp.link_web,
+      link_apk: newApp.link_apk,
+      link_desktop: newApp.link_desktop
+    });
+    if(error) {
+      alert("Erro! Verifique se rodou o comando SQL para criar a tabela ecosystem_apps.");
+    } else {
+      setShowAppModal(false);
+      setNewApp({ name: '', description: '', icon_url: '', link_web: '', link_apk: '', link_desktop: '' });
+      fetchEcosystemApps();
+    }
+  };
+
+  const handleDeleteApp = async (appId) => {
+    if(window.confirm("Remover este App do ecossistema?")) {
+      await supabase.from('ecosystem_apps').delete().eq('id', appId);
+      fetchEcosystemApps();
+    }
   };
 
   const toggleVerifiedStatus = async (userId, currentStatus) => {
@@ -123,6 +160,12 @@ export default function Admin({ user }) {
             className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'widgets' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-600'}`}
           >
             <LayoutDashboard size={18} /> Widgets Globais
+          </button>
+          <button 
+            onClick={() => setActiveTab('arsenal')} 
+            className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'arsenal' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-600'}`}
+          >
+            <LayoutDashboard size={18} /> Arsenal de Apps
           </button>
         </div>
 
@@ -263,6 +306,92 @@ export default function Admin({ user }) {
                   <button type="submit" className="flex-1 py-3 px-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition">
                     Salvar
                   </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Arsenal de Apps */}
+        {activeTab === 'arsenal' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-slate-50">Arsenal de Apps (Menu Google)</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ecosystemApps.map(app => (
+                <div key={app.id} className="glass-card p-5 relative group flex items-start gap-4">
+                  <button 
+                    onClick={() => handleDeleteApp(app.id)}
+                    className="absolute top-4 right-4 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                  <img src={app.icon_url} alt="" className="w-16 h-16 rounded-2xl object-cover shadow-lg" />
+                  <div>
+                    <h3 className="font-bold text-lg mb-1 text-slate-50">{app.name}</h3>
+                    <p className="text-xs text-slate-400 mb-3 line-clamp-2">{app.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {app.link_web && <a href={app.link_web} target="_blank" rel="noopener noreferrer" className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Web</a>}
+                      {app.link_apk && <a href={app.link_apk} target="_blank" rel="noopener noreferrer" className="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded">APK</a>}
+                      {app.link_desktop && <a href={app.link_desktop} target="_blank" rel="noopener noreferrer" className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-1 rounded">Desktop</a>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              <div 
+                onClick={() => setShowAppModal(true)}
+                className="glass-card p-5 flex flex-col items-center justify-center min-h-[120px] border-2 border-dashed border-slate-700 hover:border-orange-500/50 cursor-pointer transition-colors group"
+              >
+                <div className="w-12 h-12 bg-slate-800 group-hover:bg-orange-500/20 rounded-full flex items-center justify-center text-slate-400 group-hover:text-orange-400 mb-2 transition-colors">
+                  <Plus size={24} />
+                </div>
+                <span className="font-medium text-slate-300">Novo App no Menu</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Novo App */}
+        {showAppModal && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="glass-card w-full max-w-md p-6">
+              <h2 className="text-xl font-bold text-slate-50 mb-6 flex items-center gap-2">
+                <Plus size={20} className="text-orange-500" />
+                Novo App no Ecossistema
+              </h2>
+              <form onSubmit={handleCreateApp} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-1">Nome do App *</label>
+                  <input type="text" required value={newApp.name} onChange={e => setNewApp({...newApp, name: e.target.value})} className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-1">URL do Ícone (Imagem) *</label>
+                  <input type="url" required value={newApp.icon_url} onChange={e => setNewApp({...newApp, icon_url: e.target.value})} className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-1">Descrição</label>
+                  <input type="text" value={newApp.description} onChange={e => setNewApp({...newApp, description: e.target.value})} className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Link Web</label>
+                    <input type="url" value={newApp.link_web} onChange={e => setNewApp({...newApp, link_web: e.target.value})} className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Link APK</label>
+                    <input type="url" value={newApp.link_apk} onChange={e => setNewApp({...newApp, link_apk: e.target.value})} className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-400 mb-1">Link Desktop</label>
+                    <input type="url" value={newApp.link_desktop} onChange={e => setNewApp({...newApp, link_desktop: e.target.value})} className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button type="button" onClick={() => setShowAppModal(false)} className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl transition">Cancelar</button>
+                  <button type="submit" className="flex-1 py-3 px-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition">Salvar App</button>
                 </div>
               </form>
             </div>
