@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../supabase';
-import { Newspaper, CheckCircle, Eye, FileText, X, Plus, Users } from 'lucide-react';
+import { Newspaper, CheckCircle, Eye, FileText, X, Plus, Users, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WidgetNoticias({ currentUser, isAdmin }) {
@@ -120,9 +120,20 @@ export default function WidgetNoticias({ currentUser, isAdmin }) {
                   <span className="text-[10px] text-slate-500">{new Date(news.created_at).toLocaleDateString()}</span>
                   
                   {isAdmin ? (
-                    <span className="text-[10px] flex items-center gap-1 bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full" onClick={(e) => { e.stopPropagation(); loadReaders(news.id); }}>
-                      <Eye size={12} /> {readCount} leram
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] flex items-center gap-1 bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full hover:bg-emerald-500/40 transition" onClick={(e) => { e.stopPropagation(); loadReaders(news.id); }}>
+                        <Eye size={12} /> {readCount} leram
+                      </span>
+                      <button onClick={async (e) => {
+                        e.stopPropagation();
+                        if(window.confirm('Excluir esta notícia?')) {
+                          await supabase.from('news').delete().eq('id', news.id);
+                          setNewsList(newsList.filter(n => n.id !== news.id));
+                        }
+                      }} className="text-red-400 hover:text-red-300 transition-colors p-1 bg-red-500/10 rounded-full" title="Excluir">
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
                   ) : (
                     hasRead ? (
                       <span className="text-[10px] flex items-center gap-1 text-emerald-500"><CheckCircle size={12} /> Ciente</span>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { HelpCircle, Send } from 'lucide-react';
+import { HelpCircle, Send, Trash2 } from 'lucide-react';
 import { supabase } from '../../supabase';
 
 export default function WidgetDuvidas({ currentUser, isAdmin }) {
@@ -84,7 +84,19 @@ export default function WidgetDuvidas({ currentUser, isAdmin }) {
         ) : (
           questions.map(q => (
             <div key={q.id} className="bg-slate-800/50 p-3 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-colors">
-              <p className="text-sm text-slate-200 font-medium mb-2 leading-tight">"{q.text}"</p>
+              <div className="flex justify-between items-start">
+                <p className="text-sm text-slate-200 font-medium mb-2 leading-tight flex-1">"{q.text}"</p>
+                {isAdmin && (
+                  <button onClick={async () => {
+                    if(window.confirm('Excluir esta dúvida?')) {
+                      await supabase.from('questions').delete().eq('id', q.id);
+                      setQuestions(questions.filter(question => question.id !== q.id));
+                    }
+                  }} className="text-red-400 hover:text-red-300 ml-2 p-1" title="Excluir">
+                    <Trash2 size={12} />
+                  </button>
+                )}
+              </div>
               <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-wide">
                 <span className="w-2 h-2 rounded-full bg-blue-500 block"></span> {q.user_name}
               </div>

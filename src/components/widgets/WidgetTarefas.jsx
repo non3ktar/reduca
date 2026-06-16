@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../supabase';
-import { BookOpen, CheckCircle, Clock, Plus, X, FileText } from 'lucide-react';
+import { BookOpen, CheckCircle, Clock, Plus, X, FileText, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WidgetTarefas({ currentUser, isAdmin }) {
@@ -134,7 +134,20 @@ export default function WidgetTarefas({ currentUser, isAdmin }) {
                 <div className="flex justify-between items-start mb-1">
                   <h4 className={`text-sm font-semibold ${hasSubmitted && !isAdmin ? 'text-slate-400 line-through' : 'text-slate-200'}`}>{task.title}</h4>
                   {!isAdmin && hasSubmitted && <CheckCircle size={14} className="text-green-500 flex-shrink-0" title="Entregue" />}
-                  {isAdmin && <span className="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full font-medium">{subsCount} entregas</span>}
+                  {isAdmin && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full font-medium">{subsCount} entregas</span>
+                      <button onClick={async (e) => {
+                        e.stopPropagation();
+                        if(window.confirm('Excluir esta tarefa e todas as submissões?')) {
+                          await supabase.from('tasks').delete().eq('id', task.id);
+                          setTasks(tasks.filter(t => t.id !== task.id));
+                        }
+                      }} className="text-red-400 hover:text-red-300 transition-colors p-1 bg-red-500/10 rounded-full" title="Excluir">
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 {task.due_date && (
                   <p className={`text-[10px] flex items-center gap-1 ${isOverdue && !hasSubmitted ? 'text-red-400 font-bold' : 'text-slate-500'}`}>

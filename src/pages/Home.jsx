@@ -11,6 +11,9 @@ import WidgetVideoDestaque from '../components/widgets/WidgetVideoDestaque';
 import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppDrawer from '../components/AppDrawer';
+import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { Download } from 'lucide-react';
 
 export default function Home({ user }) {
   const [userData, setUserData] = useState(null);
@@ -53,6 +56,30 @@ export default function Home({ user }) {
 
     return () => supabase.removeChannel(channel);
   }, [user]);
+
+  const handleManualUpdateCheck = async () => {
+    if (!Capacitor.isNativePlatform()) {
+      alert("Atualização automática apenas no aplicativo móvel.");
+      return;
+    }
+    try {
+      const info = await App.getInfo();
+      const currentBuild = parseInt(info.build || '1', 10);
+      const response = await fetch('https://reduca.zonaeducacional.org/version.json?t=' + new Date().getTime());
+      const data = await response.json();
+      const latestBuild = parseInt(data.build || '1', 10);
+
+      if (latestBuild > currentBuild) {
+        if(window.confirm(`Nova versão ${data.version} disponível!\n${data.releaseNotes}\nDeseja baixar agora?`)) {
+          window.open(data.url, '_system');
+        }
+      } else {
+        alert("Aplicativo atualizado! Você já está na versão mais recente.");
+      }
+    } catch (e) {
+      alert("Erro ao verificar atualização. Verifique sua internet.");
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -170,6 +197,13 @@ export default function Home({ user }) {
             <Bell size={22} />
             <span className="text-[10px] mt-1 font-medium">Notific.</span>
           </button>
+          
+          {Capacitor.isNativePlatform() && (
+            <button onClick={handleManualUpdateCheck} className="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-orange-500 relative transition-colors">
+              <Download size={22} />
+              <span className="text-[10px] mt-1 font-medium">Atualizar</span>
+            </button>
+          )}
 
           {showNotif && <div className="absolute bottom-16 right-4 w-48 p-3 glass-card text-sm text-slate-300 text-center shadow-xl">Sem notificações no momento</div>}
         </div>

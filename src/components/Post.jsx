@@ -62,14 +62,15 @@ export default function Post({ post, currentUser }) {
 
   const handleShare = async () => {
     try {
+      const shareUrl = `https://reduca.zonaeducacional.org/profile/${author.id}`;
       if (navigator.share) {
         await navigator.share({
           title: `Post de ${author.name}`,
           text: post.content,
-          url: window.location.href,
+          url: shareUrl,
         });
       } else {
-        await navigator.clipboard.writeText(`${window.location.origin}/profile/${author.id}`);
+        await navigator.clipboard.writeText(shareUrl);
         alert('Link copiado para a área de transferência!');
       }
     } catch (err) {
