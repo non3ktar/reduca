@@ -328,7 +328,13 @@ export default function Admin({ user }) {
                   >
                     <Trash2 size={18} />
                   </button>
-                  <img src={app.icon_url} alt="" className="w-16 h-16 rounded-2xl object-cover shadow-lg" />
+                  {app.icon_url?.startsWith('http') ? (
+                    <img src={app.icon_url} alt="" className="w-16 h-16 rounded-2xl object-cover shadow-lg" />
+                  ) : (
+                    <div className="w-16 h-16 min-w-[64px] rounded-2xl flex items-center justify-center bg-slate-800 shadow-lg text-4xl">
+                      {app.icon_url}
+                    </div>
+                  )}
                   <div>
                     <h3 className="font-bold text-lg mb-1 text-slate-50">{app.name}</h3>
                     <p className="text-xs text-slate-400 mb-3 line-clamp-2">{app.description}</p>
@@ -368,8 +374,8 @@ export default function Admin({ user }) {
                   <input type="text" required value={newApp.name} onChange={e => setNewApp({...newApp, name: e.target.value})} className="w-full glass-input !py-2" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">URL do Ícone (Imagem) *</label>
-                  <input type="url" required value={newApp.icon_url} onChange={e => setNewApp({...newApp, icon_url: e.target.value})} className="w-full glass-input !py-2" />
+                  <label className="block text-sm font-medium text-slate-400 mb-1">Ícone (Emoji ou Link de Imagem) *</label>
+                  <input type="text" required value={newApp.icon_url} onChange={e => setNewApp({...newApp, icon_url: e.target.value})} className="w-full glass-input !py-2" placeholder="Ex: 📚 ou https://..." />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-400 mb-1">Descrição</label>

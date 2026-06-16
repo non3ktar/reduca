@@ -62,12 +62,18 @@ export default function AppDrawer() {
                     className="flex flex-col items-center p-3 rounded-xl hover:bg-slate-800/60 transition group text-center"
                     title={app.description}
                   >
-                    <img 
-                      src={app.icon_url} 
-                      alt={app.name} 
-                      className="w-12 h-12 rounded-2xl mb-2 object-cover shadow-lg group-hover:scale-110 transition-transform duration-300" 
-                      onError={(e) => { e.target.src = 'https://placehold.co/100x100?text=App' }}
-                    />
+                    {app.icon_url?.startsWith('http') ? (
+                      <img 
+                        src={app.icon_url} 
+                        alt={app.name} 
+                        className="w-12 h-12 rounded-2xl mb-2 object-cover shadow-lg group-hover:scale-110 transition-transform duration-300" 
+                        onError={(e) => { e.target.src = 'https://placehold.co/100x100?text=App' }}
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl mb-2 bg-slate-800 flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        {app.icon_url}
+                      </div>
+                    )}
                     <span className="text-xs font-medium text-slate-300 group-hover:text-white truncate w-full">
                       {app.name}
                     </span>
