@@ -21,19 +21,6 @@ export default function Admin({ user }) {
   const [showWidgetModal, setShowWidgetModal] = useState(false);
   const [newWidget, setNewWidget] = useState({ title: '', description: '', url: '' });
 
-  useEffect(() => {
-    // Check if user is admin
-    supabase.from('profiles').select('is_admin').eq('id', user.id).single().then(({ data }) => {
-      if (data && data.is_admin) {
-        setIsAdmin(true);
-        fetchGlobalWidgets();
-        fetchUsers();
-        fetchEcosystemApps();
-      }
-      setLoading(false);
-    });
-  }, [user.id]);
-
   const fetchGlobalWidgets = async () => {
     const { data } = await supabase.from('custom_widgets').select('*').eq('user_id', user.id);
     if (data) setGlobalWidgets(data);
@@ -48,6 +35,19 @@ export default function Admin({ user }) {
     const { data } = await supabase.from('ecosystem_apps').select('*').order('created_at', { ascending: true });
     if (data) setEcosystemApps(data);
   };
+
+  useEffect(() => {
+    // Check if user is admin
+    supabase.from('profiles').select('is_admin').eq('id', user.id).single().then(({ data }) => {
+      if (data && data.is_admin) {
+        setIsAdmin(true);
+        fetchGlobalWidgets();
+        fetchUsers();
+        fetchEcosystemApps();
+      }
+      setLoading(false);
+    });
+  }, [user.id]);
 
   const handleCreateApp = async (e) => {
     e.preventDefault();

@@ -18,7 +18,7 @@ export default function Marketplace({ user }) {
         setIsAdmin(true);
         // Only load data if admin
         supabase.from('user_settings').select('active_widgets').eq('user_id', user.id).single().then(({ data: settings }) => {
-          if (settings && settings.active_widgets) setActiveWidgets(settings.active_widgets);
+          if (settings && Array.isArray(settings.active_widgets)) setActiveWidgets(settings.active_widgets);
         });
 
         supabase.from('custom_widgets').select('*').eq('user_id', user.id).then(({ data: customData }) => {
@@ -30,16 +30,16 @@ export default function Marketplace({ user }) {
     });
   }, [user.id, navigate]);
 
-  if (!isAdmin) {
-    return <div className="min-h-screen pt-20 text-center text-slate-500">Verificando permissões...</div>;
-  }
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWidget, setEditingWidget] = useState(null);
   const [customTitle, setCustomTitle] = useState('');
   const [customDesc, setCustomDesc] = useState('');
   const [customUrl, setCustomUrl] = useState('');
   const [customImage, setCustomImage] = useState('');
+
+  if (!isAdmin) {
+    return <div className="min-h-screen pt-20 text-center text-slate-500">Verificando permissões...</div>;
+  }
 
   const openEditModal = (widget) => {
     setEditingWidget(widget);

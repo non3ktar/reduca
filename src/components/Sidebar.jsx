@@ -43,7 +43,7 @@ export default function Sidebar({ currentUser, className = 'hidden md:block' }) 
 
     function loadWidgetsForUser(userId) {
       supabase.from('user_settings').select('active_widgets').eq('user_id', userId).single().then(({ data }) => {
-        if (data && data.active_widgets) setActiveWidgets(data.active_widgets);
+        if (data && Array.isArray(data.active_widgets)) setActiveWidgets(data.active_widgets);
       });
 
       supabase.from('custom_widgets').select('*').eq('user_id', userId).then(({ data }) => {
