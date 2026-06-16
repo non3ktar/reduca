@@ -50,7 +50,7 @@ export default function App() {
   const routerBasename = Capacitor.isNativePlatform() ? "" : "/reduca";
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-[#020617] text-white' : 'bg-[#FFFDF2] text-slate-900'} relative`}>
+    <div className="min-h-screen transition-colors duration-300 relative text-[var(--text-primary)]">
       <Router basename={routerBasename}>
         <ScrollToTop />
         <Routes>
