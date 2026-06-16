@@ -10,6 +10,7 @@ import Privacy from './pages/Privacy';
 import Blog from './pages/Blog';
 import Apps from './pages/Apps';
 import ScrollToTop from './components/ScrollToTop';
+import AutoUpdater from './components/AutoUpdater';
 import { supabase } from './supabase';
 import { usePushNotifications } from './hooks/usePushNotifications';
 import { Capacitor } from '@capacitor/core';
@@ -48,20 +49,25 @@ export default function App() {
   const routerBasename = Capacitor.isNativePlatform() ? "" : "/reduca";
 
   return (
-    <Router basename={routerBasename}>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/login" element={session ? <Navigate to="/" /> : <Login />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/" element={session ? <Home user={session.user} /> : <Navigate to="/login" />} />
-        <Route path="/blog" element={session ? <Blog user={session.user} /> : <Navigate to="/login" />} />
-        <Route path="/marketplace" element={session ? <Marketplace user={session.user} /> : <Navigate to="/login" />} />
-        <Route path="/apps" element={session ? <Apps /> : <Navigate to="/login" />} />
-        <Route path="/admin" element={session ? <Admin user={session.user} /> : <Navigate to="/login" />} />
-        <Route path="/profile" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
-        <Route path="/profile/:id" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
-      </Routes>
-    </Router>
+    <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-[#020617] text-white' : 'bg-[#FFFDF2] text-slate-900'} relative`}>
+      <Router basename={routerBasename}>
+        <ScrollToTop />
+        <Routes>
+          <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          
+          {/* Protected Routes */}
+          <Route path="/" element={session ? <Home user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/blog" element={session ? <Blog user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/marketplace" element={session ? <Marketplace user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/apps" element={session ? <Apps /> : <Navigate to="/login" />} />
+          <Route path="/admin" element={session ? <Admin user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/profile" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/profile/:id" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
+        </Routes>
+        <AutoUpdater />
+      </Router>
+    </div>
   );
 }
