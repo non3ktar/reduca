@@ -71,6 +71,11 @@ export default function WidgetTarefas({ currentUser, isAdmin }) {
       setNewTaskDesc('');
       setNewTaskDue('');
       setIsModalOpen(false);
+      
+      // Dispara a notificação push
+      supabase.functions.invoke('push-notify', {
+        body: { title: "Nova Tarefa: " + newTaskTitle, body: "Prazo final: " + (newTaskDue || "Sem prazo") }
+      }).catch(console.error);
     }
     if (error) alert("Erro ao criar tarefa. O banco de dados foi atualizado? " + error.message);
   };

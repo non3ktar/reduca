@@ -39,11 +39,22 @@ export default function WidgetDuvidas({ currentUser, isAdmin }) {
     const { data: profile } = await supabase.from('profiles').select('name').eq('id', currentUser.id).single();
     const userName = profile?.name || currentUser.email.split('@')[0];
 
-    await supabase.from('questions').insert([{
+    const { error: insertError } = await supabase.from('questions').insert([{
       user_id: currentUser.id,
       user_name: userName,
       text: newQuestion
     }]);
+    
+    if (!insertError) {
+      // Dispara a notificação push APENAS para os professores/admins
+      supabase.functions.invoke('push-notify', {
+        body: { 
+          title: "Mural de Dúvidas 🙋‍♂️", 
+          body: `O aluno ${userName} acabou de enviar uma dúvida.`,
+          target: "admins"
+        }
+      }).catch(console.error);
+    }
     
     setNewQuestion('');
   };

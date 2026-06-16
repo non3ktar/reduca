@@ -64,6 +64,11 @@ export default function WidgetNoticias({ currentUser, isAdmin }) {
       setTitle('');
       setContent('');
       setIsCreating(false);
+      
+      // Dispara a notificação push
+      supabase.functions.invoke('push-notify', {
+        body: { title: "Aviso: " + title, body: "Nova notícia publicada. Verifique o mural." }
+      }).catch(console.error);
     }
     if (error) alert("Erro ao publicar: " + error.message);
   };
