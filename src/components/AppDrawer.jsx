@@ -43,7 +43,8 @@ export default function AppDrawer() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-12 -right-1 md:-right-4 w-[320px] bg-[var(--bg-color)] p-4 shadow-2xl z-50 border border-slate-700/50 rounded-2xl transition-colors duration-300 origin-top-right"
+            className="absolute w-[320px] bg-[var(--bg-color)] p-4 shadow-2xl z-50 border border-slate-700/50 rounded-2xl transition-colors duration-300 origin-top-right"
+            style={{ right: '-16px', top: '56px' }}
           >
             <h3 className="text-sm font-bold text-slate-300 mb-4 px-2">Apps da Reduca</h3>
             
@@ -83,7 +84,7 @@ export default function AppDrawer() {
             )}
             
             <div className="mt-4 pt-3 border-t border-slate-800 text-center">
-              <Link to="/marketplace" className="text-xs text-orange-500 hover:text-orange-400 font-bold">
+              <Link to="/apps" className="text-xs text-orange-500 hover:text-orange-400 font-bold">
                 Explorar mais ferramentas
               </Link>
             </div>

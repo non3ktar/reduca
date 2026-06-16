@@ -8,6 +8,7 @@ import Admin from './pages/Admin';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Blog from './pages/Blog';
+import Apps from './pages/Apps';
 import ScrollToTop from './components/ScrollToTop';
 import { supabase } from './supabase';
 import { usePushNotifications } from './hooks/usePushNotifications';
@@ -56,6 +57,7 @@ export default function App() {
         <Route path="/" element={session ? <Home user={session.user} /> : <Navigate to="/login" />} />
         <Route path="/blog" element={session ? <Blog user={session.user} /> : <Navigate to="/login" />} />
         <Route path="/marketplace" element={session ? <Marketplace user={session.user} /> : <Navigate to="/login" />} />
+        <Route path="/apps" element={session ? <Apps /> : <Navigate to="/login" />} />
         <Route path="/admin" element={session ? <Admin user={session.user} /> : <Navigate to="/login" />} />
         <Route path="/profile" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
         <Route path="/profile/:id" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
