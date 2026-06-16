@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { LayoutGrid } from 'lucide-react';
 import { supabase } from '../supabase';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 export default function AppDrawer() {
   const [isOpen, setIsOpen] = useState(false);
@@ -76,9 +77,9 @@ export default function AppDrawer() {
             )}
             
             <div className="mt-4 pt-3 border-t border-slate-800 text-center">
-              <a href="/marketplace" className="text-xs text-orange-500 hover:text-orange-400 font-bold">
+              <Link to="/marketplace" className="text-xs text-orange-500 hover:text-orange-400 font-bold">
                 Explorar mais ferramentas
-              </a>
+              </Link>
             </div>
           </motion.div>
         )}
