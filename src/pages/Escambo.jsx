@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import { Link } from 'react-router-dom';
-import { RefreshCcw, Home as HomeIcon, MessageCircle, Users, Bell, BadgeCheck, BookOpen, PackageOpen, LayoutGrid, Plus, HeartHandshake, Box, ImagePlus, X, Loader2, Check, Trash2 } from 'lucide-react';
+import { RefreshCcw, Home as HomeIcon, MessageCircle, Users, Bell, BadgeCheck, BookOpen, PackageOpen, LayoutGrid, Plus, HeartHandshake, Box, ImagePlus, X, Loader2, Check, Trash2, ArrowLeft } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import AppDrawer from '../components/AppDrawer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -111,6 +111,16 @@ export default function Escambo({ user }) {
       </nav>
 
       <main className="max-w-6xl mx-auto px-4 py-6">
+        <div className="flex justify-between items-center mb-6 glass-card p-4">
+           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition text-[var(--text-primary)] font-bold">
+              <ArrowLeft size={20} className="text-orange-500" /> Voltar para o Feed
+           </Link>
+           <div className="md:hidden flex gap-2 items-center">
+             <div className="pr-1"><AppDrawer /></div>
+             <ThemeToggle />
+           </div>
+        </div>
+
         <div className="glass-card p-8 mb-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">

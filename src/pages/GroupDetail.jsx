@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Users, UserPlus, Check, Home as HomeIcon, BookOpen, MessageCircle, Bell, BadgeCheck } from 'lucide-react';
+import { ArrowLeft, Users, UserPlus, Check, Home as HomeIcon, BookOpen, MessageCircle, Bell, BadgeCheck, Settings, Trash2, Edit2, ImageIcon } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import AppDrawer from '../components/AppDrawer';
 import Sidebar from '../components/Sidebar';
@@ -16,6 +16,10 @@ export default function GroupDetail({ user }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  
+  // Edit Group Modal
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', description: '', cover_image: '' });
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -67,6 +71,39 @@ export default function GroupDetail({ user }) {
       setMemberCount(prev => prev + 1);
     }
   };
+
+  const openEditModal = () => {
+    setEditForm({ name: group.name, description: group.description, cover_image: group.cover_image });
+    setShowEditModal(true);
+  };
+
+  const handleEditGroup = async (e) => {
+    e.preventDefault();
+    if (!editForm.name.trim()) return;
+    const { error } = await supabase.from('groups').update({
+      name: editForm.name,
+      description: editForm.description,
+      cover_image: editForm.cover_image
+    }).eq('id', id);
+    if (!error) {
+      setGroup({ ...group, ...editForm });
+      setShowEditModal(false);
+    } else {
+      alert("Erro ao editar o grupo.");
+    }
+  };
+
+  const handleDeleteGroup = async () => {
+    if (window.confirm("ATENÇÃO: Você tem certeza que deseja excluir este grupo INTEIRO? Esta ação apagará todas as postagens e não pode ser desfeita!")) {
+      // Cascading delete might be configured in Supabase, but doing it manually to be safe.
+      await supabase.from('group_members').delete().eq('group_id', id);
+      await supabase.from('posts').delete().eq('group_id', id);
+      await supabase.from('groups').delete().eq('id', id);
+      window.location.href = '/groups';
+    }
+  };
+
+  const isAdmin = userData?.is_admin || userData?.role === 'admin' || group?.created_by === user.id;
 
   if (loading || !userData) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-orange-500 font-bold">Carregando grupo...</div>;
   if (!group) return <div className="text-center py-20 text-slate-400">Grupo não encontrado.</div>;
@@ -134,13 +171,26 @@ export default function GroupDetail({ user }) {
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
               
-              <div className="absolute bottom-0 left-0 w-full p-6 flex items-end justify-between">
-                <div>
+              <div className="absolute bottom-0 left-0 w-full p-6 flex flex-col md:flex-row items-end justify-between gap-4">
+                <div className="w-full">
                   <h1 className="text-3xl font-bold text-white drop-shadow-md">{group.name}</h1>
                   <p className="text-slate-300 text-sm mt-2 max-w-lg">{group.description}</p>
                 </div>
-                <button 
-                  onClick={handleJoinLeave}
+                
+                <div className="flex items-center gap-3 shrink-0">
+                  {isAdmin && (
+                    <div className="flex bg-slate-900/60 p-1.5 rounded-full border border-slate-600 backdrop-blur-md mr-2">
+                      <button onClick={openEditModal} className="p-2 text-slate-300 hover:text-orange-400 hover:bg-slate-800 rounded-full transition" title="Editar Grupo">
+                        <Edit2 size={18} />
+                      </button>
+                      <button onClick={handleDeleteGroup} className="p-2 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-full transition" title="Excluir Grupo">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  )}
+
+                  <button 
+                    onClick={handleJoinLeave}
                   className={`px-6 py-2.5 rounded-full font-bold flex items-center gap-2 shadow-lg transition-all ${
                     isMember 
                     ? 'bg-slate-700 hover:bg-slate-600 text-white border border-slate-600' 
@@ -149,6 +199,7 @@ export default function GroupDetail({ user }) {
                 >
                   {isMember ? <><Check size={18} /> Membro</> : <><UserPlus size={18} /> Participar</>}
                 </button>
+                </div>
               </div>
             </div>
           </div>
@@ -206,6 +257,67 @@ export default function GroupDetail({ user }) {
           </div>
         </aside>
       </main>
+
+      {/* Modal Editar Grupo */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="glass-card max-w-md w-full p-6 shadow-2xl border border-slate-700/50">
+            <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white flex items-center gap-2">
+              <Settings className="text-orange-500" /> Editar Grupo
+            </h2>
+            <form onSubmit={handleEditGroup} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Nome do Grupo</label>
+                <input 
+                  type="text" 
+                  value={editForm.name}
+                  onChange={e => setEditForm({...editForm, name: e.target.value})}
+                  className="glass-input w-full rounded-xl px-4 py-2.5"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Descrição</label>
+                <textarea 
+                  value={editForm.description}
+                  onChange={e => setEditForm({...editForm, description: e.target.value})}
+                  className="glass-input w-full rounded-xl px-4 py-2.5"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Capa (URL da Imagem)</label>
+                <div className="flex relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <ImageIcon size={18} className="text-slate-500" />
+                  </div>
+                  <input 
+                    type="url" 
+                    value={editForm.cover_image}
+                    onChange={e => setEditForm({...editForm, cover_image: e.target.value})}
+                    className="glass-input w-full rounded-xl pl-10 pr-4 py-2.5"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 rounded-xl transition font-bold"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg transition"
+                >
+                  Salvar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
