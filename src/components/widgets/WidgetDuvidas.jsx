@@ -65,20 +65,7 @@ export default function WidgetDuvidas({ currentUser, isAdmin }) {
         <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
           <HelpCircle size={16} className="text-blue-500" /> Mural de Dúvidas
         </h3>
-        {isAdmin ? (
-          <div className="bg-red-500/10 p-3 rounded-xl">
-            <p className="text-xs text-red-400 font-bold mb-2">Configure o Banco (Admin)</p>
-            <p className="text-[10px] text-slate-300 mb-2">Para este widget funcionar, rode no SQL Editor do Supabase:</p>
-            <code className="block text-[9px] bg-slate-900 p-2 rounded text-slate-400 font-mono whitespace-pre-wrap">
-              create table questions (id uuid default gen_random_uuid() primary key, user_id uuid references auth.users(id), user_name text, text text, created_at timestamp default now());
-              alter table questions enable row level security;
-              create policy "all" on questions for select using (true);
-              create policy "auth" on questions for insert with check (auth.role() = 'authenticated');
-            </code>
-          </div>
-        ) : (
-           <p className="text-xs text-slate-500 text-center">Em manutenção...</p>
-        )}
+        <p className="text-xs text-slate-500 text-center">Em manutenção...</p>
       </motion.div>
     );
   }

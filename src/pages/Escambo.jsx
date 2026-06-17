@@ -135,14 +135,6 @@ export default function Escambo({ user }) {
             <PackageOpen size={64} className="mx-auto text-slate-600 mb-4" />
             <h2 className="text-2xl font-bold text-slate-300 mb-2">Nenhum item anunciado ainda</h2>
             <p className="text-slate-500 max-w-md mx-auto mb-6">Seja o primeiro a anunciar um livro, uniforme ou material para troca ou doação!</p>
-            <div className="bg-slate-800/50 p-4 rounded-xl text-left max-w-lg mx-auto border border-slate-700">
-              <p className="text-xs text-slate-400 font-bold mb-2">Nota para Admin: Execute no SQL Editor do Supabase:</p>
-              <code className="block text-[10px] text-slate-500 font-mono">
-                create table barter_items (id uuid default gen_random_uuid() primary key, user_id uuid references profiles(id), title text, description text, image_url text, type text, status text default 'Disponível', created_at timestamp default now());
-                alter table barter_items enable row level security;
-                create policy "all" on barter_items for all using (true);
-              </code>
-            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

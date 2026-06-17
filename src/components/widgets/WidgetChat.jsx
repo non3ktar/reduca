@@ -69,13 +69,7 @@ export default function WidgetChat({ currentUser }) {
         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
           <MessageSquareText size={16} className="text-orange-500" /> Sala de Chat
         </h3>
-        <p className="text-xs text-red-400 font-bold mb-2">Atenção, Administrador!</p>
-        <p className="text-xs text-slate-500">
-          Para que o chat funcione, você precisa rodar este comando no SQL Editor do Supabase:
-        </p>
-        <code className="block text-[10px] bg-slate-900 p-2 rounded text-slate-300 mt-2 whitespace-pre-wrap">
-          {`create table chat_messages (id uuid default gen_random_uuid() primary key, user_id uuid references auth.users(id) not null, user_name text, user_avatar text, text text not null, created_at timestamp with time zone default timezone('utc'::text, now()) not null); alter publication supabase_realtime add table chat_messages;`}
-        </code>
+        <p className="text-xs text-slate-500">Serviço temporariamente indisponível.</p>
       </motion.div>
     );
   }
