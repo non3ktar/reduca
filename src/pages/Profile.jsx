@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { ArrowLeft, Edit3, MapPin, Briefcase, Calendar, X, BadgeCheck } from 'lucide-react';
+import { ArrowLeft, Edit3, MapPin, Briefcase, Calendar, X, BadgeCheck, Trophy, MessageSquare, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../components/ThemeToggle';
 import Post from '../components/Post';
@@ -22,6 +22,18 @@ export default function Profile({ currentUser }) {
   const [editBirthDate, setEditBirthDate] = useState('');
   const [editLocation, setEditLocation] = useState('');
   const [editRole, setEditRole] = useState('');
+  const [editCover, setEditCover] = useState('default');
+  const [editBio, setEditBio] = useState('');
+  const [editHideBirthdate, setEditHideBirthdate] = useState(false);
+
+  const coverThemes = [
+    { id: 'default', label: 'Laranja e Roxo', className: 'bg-gradient-to-r from-orange-600 to-purple-600' },
+    { id: 'ocean', label: 'Oceano Profundo', className: 'bg-gradient-to-r from-blue-600 to-cyan-500' },
+    { id: 'forest', label: 'Floresta Verde', className: 'bg-gradient-to-r from-emerald-600 to-teal-500' },
+    { id: 'sunset', label: 'Pôr do Sol', className: 'bg-gradient-to-r from-rose-500 to-amber-500' },
+    { id: 'midnight', label: 'Meia-noite', className: 'bg-gradient-to-r from-indigo-900 to-slate-900' },
+    { id: 'neon', label: 'Cyberpunk', className: 'bg-gradient-to-r from-pink-600 to-violet-600' },
+  ];
 
   useEffect(() => {
     if (!targetId) return;
@@ -42,6 +54,9 @@ export default function Profile({ currentUser }) {
       setEditBirthDate(profileUser.birth_date || '');
       setEditLocation(profileUser.location || '');
       setEditRole(profileUser.role || '');
+      setEditCover(profileUser.cover_image || 'default');
+      setEditBio(profileUser.bio || '');
+      setEditHideBirthdate(profileUser.hide_birthdate || false);
       setIsEditing(true);
     }
   };
@@ -54,14 +69,33 @@ export default function Profile({ currentUser }) {
       avatar: editAvatar,
       birth_date: editBirthDate || null,
       location: editLocation || null,
-      role: editRole || null
+      role: editRole || null,
+      cover_image: editCover,
+      bio: editBio || null,
+      hide_birthdate: editHideBirthdate
     }).eq('id', targetId);
-    setProfileUser(prev => ({ ...prev, name: editName, avatar: editAvatar, birth_date: editBirthDate, location: editLocation, role: editRole }));
+    setProfileUser(prev => ({ 
+      ...prev, 
+      name: editName, 
+      avatar: editAvatar, 
+      birth_date: editBirthDate, 
+      location: editLocation, 
+      role: editRole, 
+      cover_image: editCover,
+      bio: editBio,
+      hide_birthdate: editHideBirthdate
+    }));
     setIsEditing(false);
   };
 
   if (profileUser === undefined) return <div className="min-h-screen flex items-center justify-center text-slate-400">Carregando perfil...</div>;
   if (profileUser === null) return <div className="min-h-screen flex items-center justify-center text-slate-400">Usuário não encontrado.</div>;
+
+  // Gamificação / Engajamento
+  const totalPosts = userPosts.length;
+  const totalLikes = userPosts.reduce((acc, post) => acc + (post.likes?.length || 0), 0);
+  const totalComments = userPosts.reduce((acc, post) => acc + (post.comments?.length || 0), 0);
+  const engajamentoScore = (totalPosts * 10) + (totalLikes * 2) + (totalComments * 5);
 
   return (
     <div className="min-h-screen pb-20 pt-6 px-4 md:px-12 max-w-2xl mx-auto relative">
@@ -71,7 +105,7 @@ export default function Profile({ currentUser }) {
 
       {/* Header Profile */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden mb-8 border border-slate-700/50">
-        <div className="h-48 bg-gradient-to-r from-orange-600 to-purple-600 relative">
+        <div className={`h-48 ${coverThemes.find(t => t.id === (profileUser.cover_image || 'default'))?.className || coverThemes[0].className} relative transition-colors duration-500`}>
           {isOwnProfile && (
             <button 
               onClick={handleEditClick}
@@ -105,15 +139,53 @@ export default function Profile({ currentUser }) {
           </h1>
           <p className="text-slate-400 mb-6 font-medium">@{profileUser.email ? profileUser.email.split('@')[0] : (profileUser.name?.replace(/\s+/g, '').toLowerCase() || 'usuario')}</p>
 
-          <div className="flex flex-wrap items-center gap-6 text-sm text-slate-300 bg-slate-900/30 p-4 rounded-xl border border-slate-700/50 w-fit">
+          <div className="flex flex-wrap items-center gap-6 text-sm text-slate-300 bg-slate-900/30 p-4 rounded-xl border border-slate-700/50 w-fit mb-6">
             <span className="flex items-center gap-2"><Briefcase size={16} className="text-orange-500"/> {profileUser.role || 'Professor(a)'}</span>
             <span className="flex items-center gap-2"><MapPin size={16} className="text-orange-500"/> {profileUser.location || 'Brasil'}</span>
-            {profileUser.birth_date ? (
-              <span className="flex items-center gap-2"><Calendar size={16} className="text-orange-500"/> Nasc.: {new Date(profileUser.birth_date + 'T12:00:00Z').toLocaleDateString('pt-BR')}</span>
-            ) : (
-              <span className="flex items-center gap-2"><Calendar size={16} className="text-orange-500"/> Desde 2026</span>
+            {!profileUser.hide_birthdate && (
+              profileUser.birth_date ? (
+                <span className="flex items-center gap-2"><Calendar size={16} className="text-orange-500"/> Nasc.: {new Date(profileUser.birth_date + 'T12:00:00Z').toLocaleDateString('pt-BR')}</span>
+              ) : (
+                <span className="flex items-center gap-2"><Calendar size={16} className="text-orange-500"/> Desde 2026</span>
+              )
             )}
           </div>
+
+          {/* Gamificação / Score */}
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="bg-gradient-to-br from-orange-500/20 to-purple-500/20 border border-orange-500/30 px-5 py-3 rounded-2xl flex items-center gap-4 shadow-lg">
+              <div className="bg-orange-500 p-2.5 rounded-xl shadow-lg shadow-orange-500/40">
+                <Trophy size={24} className="text-white" />
+              </div>
+              <div>
+                <p className="text-[10px] text-orange-300 font-bold uppercase tracking-wider">Score Reduca</p>
+                <p className="text-2xl font-black text-slate-50 leading-none mt-1">{engajamentoScore}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 bg-slate-900/50 border border-slate-700/50 px-5 py-3 rounded-2xl">
+               <div className="text-center">
+                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Posts</p>
+                 <p className="text-lg font-bold text-slate-200">{totalPosts}</p>
+               </div>
+               <div className="w-px h-8 bg-slate-700"></div>
+               <div className="text-center">
+                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1 justify-center"><Heart size={10}/> Likes</p>
+                 <p className="text-lg font-bold text-slate-200">{totalLikes}</p>
+               </div>
+               <div className="w-px h-8 bg-slate-700"></div>
+               <div className="text-center">
+                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1 justify-center"><MessageSquare size={10}/> Coments</p>
+                 <p className="text-lg font-bold text-slate-200">{totalComments}</p>
+               </div>
+            </div>
+          </div>
+          
+          {profileUser.bio && (
+            <div className="text-slate-300 bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 leading-relaxed text-sm">
+              <p className="whitespace-pre-wrap">{profileUser.bio}</p>
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -156,7 +228,11 @@ export default function Profile({ currentUser }) {
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1 uppercase font-bold tracking-wide">Data de Nascimento</label>
-                  <input type="date" value={editBirthDate} onChange={e => setEditBirthDate(e.target.value)} className="glass-input w-full" />
+                  <input type="date" value={editBirthDate} onChange={e => setEditBirthDate(e.target.value)} className="glass-input w-full mb-2" />
+                  <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                    <input type="checkbox" checked={editHideBirthdate} onChange={e => setEditHideBirthdate(e.target.checked)} className="rounded border-slate-600 bg-slate-800 text-orange-500 focus:ring-orange-500" />
+                    Ocultar data de nascimento no perfil
+                  </label>
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1 uppercase font-bold tracking-wide">Localidade (Cidade/Estado)</label>
@@ -165,6 +241,25 @@ export default function Profile({ currentUser }) {
                 <div>
                   <label className="block text-xs text-slate-400 mb-1 uppercase font-bold tracking-wide">Cargo / Título</label>
                   <input type="text" value={editRole} onChange={e => setEditRole(e.target.value)} placeholder="Ex: Professor(a) de História" className="glass-input w-full" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1 uppercase font-bold tracking-wide">Biografia</label>
+                  <textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Conte um pouco sobre você..." className="glass-input w-full min-h-[80px] resize-y" />
+                </div>
+                
+                <div>
+                  <label className="block text-xs text-slate-400 mb-2 uppercase font-bold tracking-wide">Tema da Capa</label>
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                    {coverThemes.map(theme => (
+                      <button
+                        key={theme.id}
+                        type="button"
+                        onClick={() => setEditCover(theme.id)}
+                        className={`h-10 rounded-lg border-2 transition-all ${theme.className} ${editCover === theme.id ? 'border-white scale-105 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                        title={theme.label}
+                      ></button>
+                    ))}
+                  </div>
                 </div>
                 
                 <button type="submit" className="w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-3 rounded-xl transition-colors shadow-lg shadow-orange-500/30 mt-4">

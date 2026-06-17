@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
-import { ShieldAlert, ArrowLeft, Plus, Trash2, Users, LayoutDashboard, Settings, UserCheck, UserX, BadgeCheck } from 'lucide-react';
+import { ShieldAlert, ArrowLeft, Plus, Trash2, Users, LayoutDashboard, Settings, UserCheck, UserX, BadgeCheck, Star, X } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 
@@ -20,6 +20,19 @@ export default function Admin({ user }) {
   // Modal de Widgets
   const [showWidgetModal, setShowWidgetModal] = useState(false);
   const [newWidget, setNewWidget] = useState({ title: '', description: '', url: '' });
+
+  // Modal de Selos
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userBadges, setUserBadges] = useState([]);
+
+  const availableBadges = [
+    { id: 'vibe_coder', name: 'Vibe Coder', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
+    { id: 'top_mentor', name: 'Top Mentor', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
+    { id: 'professor', name: 'Professor', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+    { id: 'aluno_destaque', name: 'Aluno Destaque', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
+    { id: 'gestor', name: 'Gestor', color: 'bg-red-500/20 text-red-400 border-red-500/30' }
+  ];
 
   const fetchGlobalWidgets = async () => {
     const { data } = await supabase.from('custom_widgets').select('*').eq('user_id', user.id);
@@ -86,6 +99,30 @@ export default function Admin({ user }) {
       } else {
         fetchUsers();
       }
+    }
+  };
+
+  const openBadgeModal = (u) => {
+    setSelectedUser(u);
+    setUserBadges(u.badges || []);
+    setShowBadgeModal(true);
+  };
+
+  const toggleBadge = (badgeId) => {
+    if (userBadges.includes(badgeId)) {
+      setUserBadges(userBadges.filter(b => b !== badgeId));
+    } else {
+      setUserBadges([...userBadges, badgeId]);
+    }
+  };
+
+  const handleSaveBadges = async () => {
+    const { error } = await supabase.from('profiles').update({ badges: userBadges }).eq('id', selectedUser.id);
+    if(error) {
+      alert("Erro ao salvar selos! Você rodou o SQL para adicionar a coluna badges?");
+    } else {
+      setShowBadgeModal(false);
+      fetchUsers();
     }
   };
 
@@ -200,30 +237,100 @@ export default function Admin({ user }) {
                         <td className="p-4 text-sm text-slate-400">{u.email}</td>
                         <td className="p-4 text-sm text-slate-400">{u.role || 'Membro'}</td>
                         <td className="p-4 text-center">
-                          {u.is_verified ? (
-                            <span className="inline-flex items-center gap-1 bg-blue-500/20 text-blue-400 text-xs font-bold px-2.5 py-1 rounded-full">
-                              <BadgeCheck size={14} className="fill-blue-500 text-white" /> Verificado
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 bg-slate-700 text-slate-300 text-xs font-medium px-2.5 py-1 rounded-full">
-                              <UserCheck size={12} /> Comum
-                            </span>
-                          )}
+                          <div className="flex flex-col items-center gap-1">
+                            {u.is_verified ? (
+                              <span className="inline-flex items-center gap-1 bg-blue-500/20 text-blue-400 text-xs font-bold px-2.5 py-1 rounded-full">
+                                <BadgeCheck size={14} className="fill-blue-500 text-white" /> Verificado
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 bg-slate-700 text-slate-300 text-xs font-medium px-2.5 py-1 rounded-full">
+                                <UserCheck size={12} /> Comum
+                              </span>
+                            )}
+                            {u.badges && u.badges.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-1 justify-center max-w-[120px]">
+                                {u.badges.map(bId => {
+                                  const badge = availableBadges.find(b => b.id === bId);
+                                  return badge ? (
+                                    <span key={bId} className={`text-[10px] px-2 py-0.5 rounded-full border ${badge.color}`}>
+                                      {badge.name}
+                                    </span>
+                                  ) : null;
+                                })}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="p-4 text-center">
-                          <button 
-                            onClick={() => toggleVerifiedStatus(u.id, u.is_verified)}
-                            className={`p-2 rounded-lg transition-colors ${u.is_verified ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'}`}
-                            title={u.is_verified ? "Remover Verificado" : "Dar Selo de Verificado"}
-                          >
-                            {u.is_verified ? <UserX size={18} /> : <BadgeCheck size={18} />}
-                          </button>
+                          <div className="flex items-center justify-center gap-2">
+                            <button 
+                              onClick={() => toggleVerifiedStatus(u.id, u.is_verified)}
+                              className={`p-2 rounded-lg transition-colors ${u.is_verified ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'}`}
+                              title={u.is_verified ? "Remover Verificado" : "Dar Selo de Verificado"}
+                            >
+                              {u.is_verified ? <UserX size={18} /> : <BadgeCheck size={18} />}
+                            </button>
+                            <button 
+                              onClick={() => openBadgeModal(u)}
+                              className="p-2 rounded-lg bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors"
+                              title="Gerenciar Selos Especiais"
+                            >
+                              <Star size={18} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Selos */}
+        {showBadgeModal && selectedUser && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="glass-card w-full max-w-md p-6 relative">
+              <button onClick={() => setShowBadgeModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+              
+              <h2 className="text-xl font-bold text-slate-50 mb-2 flex items-center gap-2">
+                <Star size={20} className="text-purple-500" />
+                Gerenciar Selos
+              </h2>
+              <p className="text-sm text-slate-400 mb-6">Selecione os selos para <strong>{selectedUser.name}</strong></p>
+              
+              <div className="space-y-3 mb-6 max-h-64 overflow-y-auto custom-scrollbar pr-2">
+                {availableBadges.map(badge => {
+                  const hasBadge = userBadges.includes(badge.id);
+                  return (
+                    <div 
+                      key={badge.id}
+                      onClick={() => toggleBadge(badge.id)}
+                      className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                        hasBadge ? 'bg-slate-800 border-purple-500/50' : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${badge.color}`}>
+                          <Star size={14} />
+                        </div>
+                        <span className={`font-medium ${hasBadge ? 'text-white' : 'text-slate-400'}`}>{badge.name}</span>
+                      </div>
+                      {hasBadge && <BadgeCheck size={18} className="text-purple-500" />}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button 
+                onClick={handleSaveBadges}
+                className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition"
+              >
+                Salvar Selos
+              </button>
             </div>
           </div>
         )}

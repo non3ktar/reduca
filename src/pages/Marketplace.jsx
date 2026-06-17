@@ -13,7 +13,7 @@ export default function Marketplace({ user }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data }) => {
+    supabase.from('profiles').select('role, is_admin').eq('id', user.id).single().then(({ data }) => {
       if (data && (data.is_admin || data.role === 'admin' || data.role === 'professor')) {
         setIsAdmin(true);
         // Only load data if admin

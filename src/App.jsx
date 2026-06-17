@@ -9,6 +9,11 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Blog from './pages/Blog';
 import Apps from './pages/Apps';
+import Groups from './pages/Groups';
+import GroupDetail from './pages/GroupDetail';
+import Escambo from './pages/Escambo';
+import Forum from './pages/Forum';
+import ForumTopic from './pages/ForumTopic';
 import ScrollToTop from './components/ScrollToTop';
 import AutoUpdater from './components/AutoUpdater';
 import { supabase } from './supabase';
@@ -64,6 +69,11 @@ export default function App() {
           <Route path="/marketplace" element={session ? <Marketplace user={session.user} /> : <Navigate to="/login" />} />
           <Route path="/apps" element={session ? <Apps /> : <Navigate to="/login" />} />
           <Route path="/admin" element={session ? <Admin user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/groups" element={session ? <Groups user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/groups/:id" element={session ? <GroupDetail user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/escambo" element={session ? <Escambo user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/forum" element={session ? <Forum user={session.user} /> : <Navigate to="/login" />} />
+          <Route path="/forum/:id" element={session ? <ForumTopic user={session.user} /> : <Navigate to="/login" />} />
           <Route path="/profile" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
           <Route path="/profile/:id" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
         </Routes>

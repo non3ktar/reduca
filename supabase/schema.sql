@@ -7,7 +7,37 @@ create table public.profiles (
   birth_date text,
   location text,
   role text,
-  push_token text
+  push_token text,
+  badges text[] default '{}'::text[],
+  favorite_articles uuid[] default '{}'::uuid[],
+  cover_image text default 'default',
+  bio text,
+  hide_birthdate boolean default false
+);
+
+create table public.forum_topics (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  content text not null,
+  category text not null,
+  author_id uuid references public.profiles(id) not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create table public.forum_replies (
+  id uuid default gen_random_uuid() primary key,
+  topic_id uuid references public.forum_topics(id) on delete cascade not null,
+  content text not null,
+  author_id uuid references public.profiles(id) not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create table public.library_materials (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  url text not null,
+  type text default 'link',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 create table public.posts (
@@ -115,3 +145,52 @@ create policy "News viewable by everyone." on public.news for select using (true
 create policy "News modifiable by authenticated users." on public.news for all using (auth.role() = 'authenticated');
 create policy "Receipts viewable by everyone." on public.news_receipts for select using (true);
 create policy "Receipts modifiable by authenticated users." on public.news_receipts for all using (auth.role() = 'authenticated');
+
+-- 7. Grupos de Interesse
+create table public.groups (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  description text,
+  cover_image text,
+  created_by uuid references public.profiles(id) on delete cascade not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create table public.group_members (
+  id uuid default gen_random_uuid() primary key,
+  group_id uuid references public.groups(id) on delete cascade not null,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  role text default 'member',
+  joined_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  unique(group_id, user_id)
+);
+
+alter table public.groups enable row level security;
+alter table public.group_members enable row level security;
+
+create policy "Groups viewable by everyone." on public.groups for select using (true);
+create policy "Groups modifiable by authenticated users." on public.groups for all using (auth.role() = 'authenticated');
+create policy "Group members viewable by everyone." on public.group_members for select using (true);
+create policy "Group members modifiable by authenticated users." on public.group_members for all using (auth.role() = 'authenticated');
+
+-- Adicionando group_id à tabela posts se não existir
+alter table public.posts add column if not exists group_id uuid references public.groups(id) on delete cascade;
+
+-- 8. Coleta de Contatos (Newsletter / WhatsApp)
+create table public.marketing_leads (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  name text not null,
+  email text not null,
+  whatsapp text,
+  opt_in boolean default true,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  unique(user_id)
+);
+
+alter table public.marketing_leads enable row level security;
+
+create policy "Leads viewable by owner." on public.marketing_leads for select using (auth.uid() = user_id);
+create policy "Leads insertable by owner." on public.marketing_leads for insert with check (auth.uid() = user_id);
+create policy "Leads modifiable by owner." on public.marketing_leads for update using (auth.uid() = user_id);
+

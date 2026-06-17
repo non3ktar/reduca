@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { availableWidgets } from './widgets/registry';
 import WidgetCustom from './widgets/WidgetCustom';
-import WidgetArtigos from './widgets/WidgetArtigos';
 import WidgetCalendario from './widgets/WidgetCalendario';
 import WidgetAvisos from './widgets/WidgetAvisos';
 import WidgetTarefas from './widgets/WidgetTarefas';
@@ -15,13 +14,17 @@ export default function Sidebar({ currentUser, className = 'hidden md:block' }) 
   const [activeWidgets, setActiveWidgets] = useState(['quem-seguir']);
   const [customWidgets, setCustomWidgets] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userProfile, setUserProfile] = useState(currentUser);
 
   useEffect(() => {
     if (!currentUser) return;
     
-    // Check if user is admin
-    supabase.from('profiles').select('is_admin').eq('id', currentUser.id).single().then(({ data }) => {
-      if (data && data.is_admin) setIsAdmin(true);
+    // Fetch full profile (including badges, role, is_admin)
+    supabase.from('profiles').select('*').eq('id', currentUser.id).single().then(({ data }) => {
+      if (data) {
+        setUserProfile({ ...currentUser, ...data });
+        if (data.is_admin) setIsAdmin(true);
+      }
     });
 
     // Tenta buscar o admin
@@ -55,17 +58,16 @@ export default function Sidebar({ currentUser, className = 'hidden md:block' }) 
 
   return (
     <aside className={`sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar space-y-6 pb-24 md:pb-6 ${className}`}>
-      <WidgetCalendario currentUser={currentUser} isAdmin={isAdmin} />
-      <WidgetNoticias currentUser={currentUser} isAdmin={isAdmin} />
+      <WidgetCalendario currentUser={userProfile} isAdmin={isAdmin} />
+      <WidgetNoticias currentUser={userProfile} isAdmin={isAdmin} />
       <WidgetAvisos />
-      <WidgetTarefas currentUser={currentUser} isAdmin={isAdmin} />
-      <WidgetArtigos isAdmin={isAdmin} />
+      <WidgetTarefas currentUser={userProfile} isAdmin={isAdmin} />
       <AnimatePresence>
-        {activeWidgets.filter(id => !['quem-seguir', 'aniversarios', 'calendario', 'noticias', 'avisos', 'tarefas'].includes(id)).map(widgetId => {
+        {activeWidgets.filter(id => !['quem-seguir', 'aniversarios', 'calendario', 'noticias', 'avisos', 'tarefas', 'artigos'].includes(id)).map(widgetId => {
           const WidgetDefinition = availableWidgets.find(w => w.id === widgetId);
           if (WidgetDefinition) {
             const WidgetComponent = WidgetDefinition.component;
-            return <WidgetComponent key={widgetId} currentUser={currentUser} isAdmin={isAdmin} />;
+            return <WidgetComponent key={widgetId} currentUser={userProfile} isAdmin={isAdmin} />;
           }
           
           const customWidget = customWidgets?.find(cw => cw.id === widgetId);

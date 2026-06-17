@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
-import { BookOpen, FileText, Send, X, Clock, User, Trash2, ArrowLeft } from 'lucide-react';
+import { BookOpen, FileText, Send, X, Clock, User, Trash2, ArrowLeft, Share2, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -10,10 +10,21 @@ export default function Blog({ user }) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [readingArticle, setReadingArticle] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
+    fetchUserData();
     fetchArticles();
   }, []);
+
+  const fetchUserData = async () => {
+    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+    if (data) {
+      if (data.favorite_articles) setFavorites(data.favorite_articles);
+      setUserData(data);
+    }
+  };
 
   const fetchArticles = async () => {
     const { data, error } = await supabase
@@ -47,6 +58,32 @@ export default function Blog({ user }) {
       await supabase.from('articles').delete().eq('id', id);
       setReadingArticle(null);
       fetchArticles();
+    }
+  };
+
+  const handleShareToFeed = async () => {
+    const content = `Acabei de ler um artigo incrível no Blog da Reduca!\n\n📑 **${readingArticle.title}**\n\nCorre lá na aba de Artigos para conferir completo! 🚀`;
+    const { error } = await supabase.from('posts').insert({
+      user_id: user.id,
+      content: content
+    });
+    
+    if (!error) {
+      alert("Artigo compartilhado no seu Feed com sucesso!");
+    } else {
+      alert("Erro ao compartilhar artigo.");
+    }
+  };
+
+  const toggleFavorite = async (articleId) => {
+    const isFav = favorites.includes(articleId);
+    const newFavs = isFav ? favorites.filter(id => id !== articleId) : [...favorites, articleId];
+    
+    setFavorites(newFavs);
+    const { error } = await supabase.from('profiles').update({ favorite_articles: newFavs }).eq('id', user.id);
+    if(error) {
+      alert("Erro ao favoritar! Você rodou o comando SQL para criar a coluna favorite_articles?");
+      setFavorites(favorites); // revert on error
     }
   };
 
@@ -159,18 +196,46 @@ export default function Blog({ user }) {
                   </p>
                 </div>
                 
-                {user.id === readingArticle.author_id && (
-                  <button 
-                    onClick={() => handleDelete(readingArticle.id)}
-                    className="ml-auto text-red-500 hover:text-red-400 flex items-center gap-1 text-sm bg-red-500/10 px-3 py-1.5 rounded-lg transition"
-                  >
-                    <Trash2 size={16} /> Excluir
-                  </button>
-                )}
+                
+                <div className="ml-auto flex items-center gap-2">
+                  {(user.id === readingArticle.author_id || userData?.is_admin || userData?.role === 'admin') && (
+                    <button 
+                      onClick={() => handleDelete(readingArticle.id)}
+                      className="text-red-500 hover:text-red-400 flex items-center gap-1 text-sm bg-red-500/10 px-3 py-1.5 rounded-lg transition"
+                    >
+                      <Trash2 size={16} /> Excluir
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className="prose prose-invert prose-orange max-w-none text-lg text-slate-300 leading-relaxed whitespace-pre-wrap">
+              <div className="prose prose-invert prose-orange max-w-none text-lg text-slate-300 leading-relaxed whitespace-pre-wrap mb-12">
                 {readingArticle.content}
+              </div>
+
+              {/* Rodapé de Ações do Artigo */}
+              <div className="mt-8 pt-6 border-t border-slate-700/50 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => toggleFavorite(readingArticle.id)}
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition shadow-lg ${
+                      favorites.includes(readingArticle.id) 
+                        ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30' 
+                        : 'bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 hover:text-white'
+                    }`}
+                  >
+                    <Heart size={20} className={favorites.includes(readingArticle.id) ? "fill-rose-400" : ""} />
+                    {favorites.includes(readingArticle.id) ? 'Favoritado' : 'Favoritar'}
+                  </button>
+                  
+                  <button 
+                    onClick={handleShareToFeed}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium bg-orange-600 hover:bg-orange-500 text-white transition shadow-lg shadow-orange-500/20"
+                  >
+                    <Share2 size={20} />
+                    Compartilhar no Feed
+                  </button>
+                </div>
               </div>
             </motion.div>
           ) : (
@@ -187,8 +252,11 @@ export default function Blog({ user }) {
                   onClick={() => setReadingArticle(article)}
                   className="glass-card p-6 cursor-pointer hover:border-orange-500/50 transition-all group flex flex-col h-full"
                 >
-                  <h2 className="text-xl font-bold text-slate-100 mb-3 group-hover:text-orange-400 transition-colors line-clamp-2">
+                  <h2 className="text-xl font-bold text-slate-100 mb-3 group-hover:text-orange-400 transition-colors line-clamp-2 flex items-start justify-between gap-2">
                     {article.title}
+                    {favorites.includes(article.id) && (
+                      <Heart size={16} className="text-rose-400 fill-rose-400 shrink-0 mt-1" />
+                    )}
                   </h2>
                   <p className="text-slate-400 mb-6 line-clamp-3 flex-1">
                     {article.content}

@@ -7,8 +7,12 @@ import ThemeToggle from '../components/ThemeToggle';
 import WidgetMembros from '../components/widgets/WidgetMembros';
 import WidgetQuemSeguir from '../components/widgets/WidgetQuemSeguir';
 import WidgetAniversarios from '../components/widgets/WidgetAniversarios';
+import WidgetGrupos from '../components/widgets/WidgetGrupos';
+import WidgetForum from '../components/widgets/WidgetForum';
+import WidgetArtigos from '../components/widgets/WidgetArtigos';
+import WidgetEscambo from '../components/widgets/WidgetEscambo';
 import WidgetVideoDestaque from '../components/widgets/WidgetVideoDestaque';
-import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays } from 'lucide-react';
+import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays, RefreshCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppDrawer from '../components/AppDrawer';
 import { App } from '@capacitor/app';
@@ -42,7 +46,9 @@ export default function Home({ user }) {
     loadProfile();
     
     const fetchPosts = () => {
-      supabase.from('posts').select('*, author:profiles(id, name, avatar, is_verified)').order('created_at', { ascending: false })
+      supabase.from('posts').select('*, author:profiles(id, name, avatar, is_verified)')
+        .is('group_id', null)
+        .order('created_at', { ascending: false })
         .then(({ data }) => setPosts(data || []));
     };
     
@@ -94,14 +100,16 @@ export default function Home({ user }) {
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold text-orange-500 hover:opacity-80 transition">Reduca</Link>
           <div className="flex items-center gap-6">
-            <Link to="/" className="text-orange-500 hover:text-orange-400 transition-colors"><HomeIcon size={24} /></Link>
-            <Link to="/blog" className="text-slate-300 hover:text-orange-400 transition-colors"><BookOpen size={24} /></Link>
+            <Link to="/" className="text-orange-500 hover:text-orange-400 transition-colors" title="Feed"><HomeIcon size={24} /></Link>
+            <Link to="/blog" className="text-slate-300 hover:text-orange-400 transition-colors" title="Blog"><BookOpen size={24} /></Link>
+            <Link to="/forum" className="text-slate-300 hover:text-orange-400 transition-colors" title="Fórum">
+              <MessageCircle size={24} />
+            </Link>
+            <Link to="/escambo" className="text-slate-300 hover:text-orange-400 transition-colors" title="Escambo Solidário">
+              <RefreshCcw size={24} />
+            </Link>
+            <Link to="/groups" className={`transition-colors ${window.location.pathname.startsWith('/groups') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Grupos"><Users size={24} /></Link>
             
-            <div className="relative">
-              <button onClick={() => {setShowMsg(!showMsg); setShowNotif(false)}} className="text-slate-300 hover:text-white transition-colors relative"><MessageCircle size={24} /></button>
-              {showMsg && <div className="absolute top-10 right-0 w-48 p-3 glass-card text-sm text-slate-300 text-center z-50">Nenhuma mensagem nova</div>}
-            </div>
-
             <div className="relative">
               <button onClick={() => {setShowNotif(!showNotif); setShowMsg(false)}} className="text-slate-300 hover:text-white transition-colors"><Bell size={24} /></button>
               {showNotif && <div className="absolute top-10 right-0 w-48 p-3 glass-card text-sm text-slate-300 text-center z-50">Sem notificações no momento</div>}
@@ -131,27 +139,37 @@ export default function Home({ user }) {
         {/* Left Sidebar (Desktop & Mobile "pessoas" tab) */}
         <aside className={`lg:block sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar space-y-6 pb-6 ${mobileTab === 'pessoas' ? 'block' : 'hidden'}`}>
           <WidgetMembros />
+          <WidgetEscambo />
+          <WidgetGrupos />
+          <WidgetForum />
+          <WidgetArtigos isAdmin={userData?.is_admin} />
           <WidgetQuemSeguir currentUser={userData} isAdmin={userData?.is_admin} />
           <WidgetAniversarios currentUser={userData} isAdmin={userData?.is_admin} />
         </aside>
 
         <div className={`space-y-6 ${mobileTab === 'feed' ? 'block' : 'hidden'} md:block`}>
-          <div className="md:hidden flex justify-between items-center mb-6 glass-card p-4 relative z-50">
-             <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition">
-                <img src={userData.avatar} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-orange-500" />
-                <div>
-                  <h2 className="font-bold flex items-center gap-1">
-                    {userData.name}
-                    {userData.is_verified && <BadgeCheck size={14} className="fill-blue-500 text-white" title="Verificado" />}
+          <div className="md:hidden flex justify-between items-center mb-6 glass-card p-3 sm:p-4 relative z-[60]">
+             <Link to="/profile" className="flex items-center gap-2 hover:opacity-80 transition min-w-0 pr-2">
+                <img src={userData.avatar} alt="Avatar" className="w-9 h-9 rounded-full border-2 border-orange-500 shrink-0" />
+                <div className="min-w-0">
+                  <h2 className="font-bold flex items-center gap-1 text-sm sm:text-base truncate">
+                    <span className="truncate">{userData.name}</span>
+                    {userData.is_verified && <BadgeCheck size={14} className="fill-blue-500 text-white shrink-0" title="Verificado" />}
                   </h2>
-                  <p className="text-xs text-slate-400">{userData.email}</p>
+                  <p className="text-[10px] sm:text-xs text-slate-400 truncate">{userData.email}</p>
                 </div>
              </Link>
-             <div className="flex gap-2 items-center">
-               <div className="pr-1"><AppDrawer /></div>
+              <div className="flex gap-1 items-center shrink-0">
+               <Link to="/forum" className="text-orange-500 p-1.5 glass rounded-full" title="Fórum">
+                 <MessageCircle size={18} />
+               </Link>
+               <Link to="/groups" className="text-orange-500 p-1.5 glass rounded-full" title="Grupos">
+                 <Users size={18} />
+               </Link>
+               <div className="px-0.5"><AppDrawer /></div>
                <ThemeToggle />
-               <button onClick={handleLogout} className="text-red-400 p-2 glass rounded-full" title="Sair">
-                  <LogOut size={20} />
+               <button onClick={handleLogout} className="text-red-400 p-1.5 glass rounded-full" title="Sair">
+                  <LogOut size={18} />
                </button>
              </div>
           </div>

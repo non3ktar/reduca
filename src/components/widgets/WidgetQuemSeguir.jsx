@@ -3,8 +3,39 @@ import { supabase } from '../../supabase';
 import { UserPlus, UserCheck, BadgeCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-function FollowUser({ user }) {
+function FollowUser({ user, currentUser }) {
   const [isFollowing, setIsFollowing] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const checkFollow = async () => {
+      const { data } = await supabase
+        .from('follows')
+        .select('*')
+        .eq('follower_id', currentUser.id)
+        .eq('following_id', user.id)
+        .single();
+      if (data) setIsFollowing(true);
+      setLoading(false);
+    };
+    checkFollow();
+  }, [currentUser, user.id]);
+
+  const handleFollowToggle = async () => {
+    if (loading || !currentUser) return;
+    const newStatus = !isFollowing;
+    setIsFollowing(newStatus); // Optimistic UI
+
+    if (newStatus) {
+      await supabase.from('follows').insert({ follower_id: currentUser.id, following_id: user.id });
+    } else {
+      await supabase.from('follows')
+        .delete()
+        .eq('follower_id', currentUser.id)
+        .eq('following_id', user.id);
+    }
+  };
 
   return (
     <div className="flex items-center gap-3 group">
@@ -17,12 +48,13 @@ function FollowUser({ user }) {
         <p className="text-xs text-slate-500 truncate">Sugerido para você</p>
       </div>
       <button 
-        onClick={() => setIsFollowing(!isFollowing)}
+        onClick={handleFollowToggle}
+        disabled={loading}
         className={`p-1.5 rounded-full transition-all ${
           isFollowing 
             ? 'bg-green-500/20 text-green-400 border border-green-500/50' 
             : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-orange-500 border border-slate-700 hover:border-orange-500'
-        }`}
+        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
         title={isFollowing ? 'Seguindo' : 'Seguir'}
       >
         {isFollowing ? <UserCheck size={16} /> : <UserPlus size={16} />}
@@ -55,11 +87,12 @@ export default function WidgetQuemSeguir({ currentUser }) {
       
       <div className="space-y-4">
         {otherUsers.map(user => (
-          <FollowUser key={user.id} user={user} />
+          <FollowUser key={user.id} user={user} currentUser={currentUser} />
         ))}
         {otherUsers.length === 0 && (
           <p className="text-xs text-slate-500">Nenhuma sugestão no momento.</p>
         )}
+
       </div>
     </motion.div>
   );
