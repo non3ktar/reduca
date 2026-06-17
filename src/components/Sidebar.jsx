@@ -57,7 +57,7 @@ export default function Sidebar({ currentUser, className = 'hidden md:block' }) 
   }, [currentUser]);
 
   return (
-    <aside className={`sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar space-y-6 pb-24 md:pb-6 ${className}`}>
+    <aside className={`space-y-4 pb-24 md:pb-6 ${className}`}>
       <WidgetCalendario currentUser={userProfile} isAdmin={isAdmin} />
       <WidgetNoticias currentUser={userProfile} isAdmin={isAdmin} />
       <WidgetAvisos />

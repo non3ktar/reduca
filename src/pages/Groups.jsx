@@ -129,7 +129,7 @@ export default function Groups({ user }) {
           )}
         </div>
 
-        <Sidebar currentUser={user} className="hidden lg:block" />
+        <Sidebar currentUser={user} className="hidden lg:block lg:h-fit lg:sticky lg:bottom-4" />
       </main>
 
       {/* Modal Criar Grupo */}

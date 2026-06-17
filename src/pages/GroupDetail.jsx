@@ -169,28 +169,28 @@ export default function GroupDetail({ user }) {
               {group.cover_image && (
                 <img src={group.cover_image} alt={group.name} className="w-full h-full object-cover" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+            </div>
+            
+            <div className="p-6 flex flex-col md:flex-row items-center md:items-start justify-between gap-4 bg-slate-900/60 backdrop-blur-md">
+              <div className="w-full text-center md:text-left">
+                <h1 className="text-3xl font-bold text-white drop-shadow-md">{group.name}</h1>
+                <p className="text-slate-300 text-sm mt-2 max-w-lg mx-auto md:mx-0">{group.description}</p>
+              </div>
               
-              <div className="absolute bottom-0 left-0 w-full p-6 flex flex-col md:flex-row items-end justify-between gap-4">
-                <div className="w-full">
-                  <h1 className="text-3xl font-bold text-white drop-shadow-md">{group.name}</h1>
-                  <p className="text-slate-300 text-sm mt-2 max-w-lg">{group.description}</p>
-                </div>
-                
-                <div className="flex items-center gap-3 shrink-0">
-                  {isAdmin && (
-                    <div className="flex bg-slate-900/60 p-1.5 rounded-full border border-slate-600 backdrop-blur-md mr-2">
-                      <button onClick={openEditModal} className="p-2 text-slate-300 hover:text-orange-400 hover:bg-slate-800 rounded-full transition" title="Editar Grupo">
-                        <Edit2 size={18} />
-                      </button>
-                      <button onClick={handleDeleteGroup} className="p-2 text-slate-300 hover:text-red-400 hover:bg-slate-800 rounded-full transition" title="Excluir Grupo">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  )}
+              <div className="flex items-center gap-3 shrink-0 mt-2 md:mt-0">
+                {isAdmin && (
+                  <div className="flex bg-slate-800/80 p-1.5 rounded-full border border-slate-600 mr-2">
+                    <button onClick={openEditModal} className="p-2 text-slate-300 hover:text-orange-400 hover:bg-slate-700 rounded-full transition" title="Editar Grupo">
+                      <Edit2 size={18} />
+                    </button>
+                    <button onClick={handleDeleteGroup} className="p-2 text-slate-300 hover:text-red-400 hover:bg-slate-700 rounded-full transition" title="Excluir Grupo">
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                )}
 
-                  <button 
-                    onClick={handleJoinLeave}
+                <button 
+                  onClick={handleJoinLeave}
                   className={`px-6 py-2.5 rounded-full font-bold flex items-center gap-2 shadow-lg transition-all ${
                     isMember 
                     ? 'bg-slate-700 hover:bg-slate-600 text-white border border-slate-600' 
@@ -199,7 +199,6 @@ export default function GroupDetail({ user }) {
                 >
                   {isMember ? <><Check size={18} /> Membro</> : <><UserPlus size={18} /> Participar</>}
                 </button>
-                </div>
               </div>
             </div>
           </div>
@@ -232,7 +231,7 @@ export default function GroupDetail({ user }) {
 
         </div>
 
-        <aside className="hidden lg:block space-y-6">
+        <aside className="hidden lg:block space-y-6 lg:h-fit lg:sticky lg:bottom-4">
           <div className="glass-card p-6 border border-slate-700/50">
             <h3 className="font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
               <Users className="text-orange-500" size={20} /> Sobre o Grupo

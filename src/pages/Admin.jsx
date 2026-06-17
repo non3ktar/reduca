@@ -126,6 +126,21 @@ export default function Admin({ user }) {
     }
   };
 
+  const handleDeleteUser = async (userId, userName) => {
+    if (userId === user.id) {
+      alert("Ação negada: Você não pode excluir sua própria conta administrativa.");
+      return;
+    }
+    if (window.confirm(`ATENÇÃO: Você tem certeza que deseja EXCLUIR o usuário "${userName}"? \n\nIsso apagará o perfil dele permanentemente. Se houver publicações vinculadas e não houver exclusão em cascata configurada no banco, pode dar erro de restrição (RLS).`)) {
+      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      if (error) {
+        alert("Erro ao excluir usuário: " + error.message);
+      } else {
+        fetchUsers();
+      }
+    }
+  };
+
   const handleCreateWidget = async (e) => {
     e.preventDefault();
     if(!newWidget.title || !newWidget.url) return;
@@ -276,6 +291,13 @@ export default function Admin({ user }) {
                               title="Gerenciar Selos Especiais"
                             >
                               <Star size={18} />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteUser(u.id, u.name)}
+                              className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                              title="Excluir Usuário"
+                            >
+                              <Trash2 size={18} />
                             </button>
                           </div>
                         </td>

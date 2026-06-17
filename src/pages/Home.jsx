@@ -137,7 +137,7 @@ export default function Home({ user }) {
 
       <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-[minmax(0,600px)_320px] lg:grid-cols-[280px_minmax(0,600px)_320px] justify-center gap-6">
         {/* Left Sidebar (Desktop & Mobile "pessoas" tab) */}
-        <aside className={`lg:block sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto no-scrollbar space-y-6 pb-6 ${mobileTab === 'pessoas' ? 'block' : 'hidden'}`}>
+        <aside className={`lg:block space-y-4 pb-6 lg:h-fit lg:sticky lg:bottom-4 ${mobileTab === 'pessoas' ? 'block' : 'hidden'}`}>
           <WidgetMembros />
           <WidgetEscambo />
           <WidgetGrupos />
@@ -190,7 +190,7 @@ export default function Home({ user }) {
         </div>
 
         {/* Sidebar */}
-        <Sidebar currentUser={user} className={`md:block ${mobileTab === 'estudos' ? 'block' : 'hidden'}`} />
+        <Sidebar currentUser={user} className={`md:block md:h-fit md:sticky md:bottom-4 ${mobileTab === 'estudos' ? 'block' : 'hidden'}`} />
       </main>
 
       {/* Bottom Nav Mobile */}
