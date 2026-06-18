@@ -16,6 +16,7 @@ import Forum from './pages/Forum';
 import ForumTopic from './pages/ForumTopic';
 import ScrollToTop from './components/ScrollToTop';
 import AutoUpdater from './components/AutoUpdater';
+import OnboardingModal from './components/OnboardingModal';
 import { supabase } from './supabase';
 import { usePushNotifications } from './hooks/usePushNotifications';
 import { Capacitor } from '@capacitor/core';
@@ -78,6 +79,7 @@ export default function App() {
           <Route path="/profile/:id" element={session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />} />
         </Routes>
         <AutoUpdater />
+        <OnboardingModal session={session} />
       </Router>
     </div>
   );
