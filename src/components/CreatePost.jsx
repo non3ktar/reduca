@@ -3,7 +3,6 @@ import { supabase } from '../supabase';
 import { ImagePlus, Send, SmilePlus, BarChart2, X, Plus, Trash2, Loader2, Sparkles, Bot, Search, Video, Image as ImageIcon, Film } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generatePostFromTopic } from '../ai';
-import { fetchAndCompressImage } from '../imageProxy';
 
 const COMMON_EMOJIS = ['👍','😂','❤️','😍','😊','🔥','💡','🚀','🙌','🤔','👏','🎉','💯','👀','📚','✏️'];
 
@@ -29,8 +28,7 @@ export default function CreatePost({ user, groupId = null }) {
   const [pixabayResults, setPixabayResults] = useState([]);
   const [pixabayType, setPixabayType] = useState('image');
   const [isSearchingMedia, setIsSearchingMedia] = useState(false);
-  const [isProcessingImage, setIsProcessingImage] = useState(false);
-  const PIXABAY_API_KEY = "25211-7a7bd55d7391fa61b9252a565";
+  const PEXELS_API_KEY = "yre4KVjRJ3cgE5iavlbnHowKODQ9VtrsRQfeOx7Clu4TFae5ziAe0663";
 
   // Giphy State
   const [showGiphy, setShowGiphy] = useState(false);
@@ -100,16 +98,16 @@ export default function CreatePost({ user, groupId = null }) {
     try {
       let url = '';
       if (pixabayType === 'video') {
-        url = `https://pixabay.com/api/videos/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(pixabayQuery)}&per_page=12&lang=pt`;
+        url = `https://api.pexels.com/videos/search?query=${encodeURIComponent(pixabayQuery)}&per_page=12&locale=pt-BR`;
       } else {
-        url = `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(pixabayQuery)}&image_type=photo&orientation=horizontal&per_page=12&lang=pt`;
+        url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(pixabayQuery)}&per_page=12&locale=pt-BR`;
       }
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: { Authorization: PEXELS_API_KEY } });
       const data = await res.json();
-      setPixabayResults(data.hits || []);
+      setPixabayResults(pixabayType === 'video' ? data.videos || [] : data.photos || []);
     } catch (err) {
       console.error(err);
-      alert('Erro ao buscar mídia no Pixabay.');
+      alert('Erro ao buscar mídia no Pexels.');
     }
     setIsSearchingMedia(false);
   };
@@ -270,14 +268,14 @@ export default function CreatePost({ user, groupId = null }) {
           {showPixabay && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mb-4 bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 overflow-hidden shadow-lg">
               <div className="flex justify-between items-center mb-3">
-                <h4 className="text-sm font-bold text-orange-400 flex items-center gap-2"><Search size={16} /> Buscar Mídia</h4>
+                <h4 className="text-sm font-bold text-emerald-500 flex items-center gap-2"><Search size={16} /> Buscar Mídia (Pexels)</h4>
                 <button type="button" onClick={() => setShowPixabay(false)} className="text-slate-500 hover:text-white">
                   <X size={16} />
                 </button>
               </div>
               
               <div className="flex items-center gap-2 mb-3">
-                <button type="button" onClick={() => {setPixabayType('image'); setPixabayResults([]);}} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${pixabayType === 'image' ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
+                <button type="button" onClick={() => {setPixabayType('image'); setPixabayResults([]);}} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${pixabayType === 'image' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
                   <ImageIcon size={14} /> Imagens
                 </button>
                 <button type="button" onClick={() => {setPixabayType('video'); setPixabayResults([]);}} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${pixabayType === 'video' ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}>
@@ -292,13 +290,13 @@ export default function CreatePost({ user, groupId = null }) {
                   value={pixabayQuery}
                   onChange={e => setPixabayQuery(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handlePixabaySearch(); } }}
-                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 text-slate-200"
+                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-200"
                 />
                 <button 
                   type="button" 
                   onClick={handlePixabaySearch} 
                   disabled={isSearchingMedia || !pixabayQuery.trim()}
-                  className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[80px]"
+                  className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[80px]"
                 >
                   {isSearchingMedia ? <Loader2 size={16} className="animate-spin" /> : 'Buscar'}
                 </button>
@@ -309,36 +307,25 @@ export default function CreatePost({ user, groupId = null }) {
                   {pixabayResults.map(res => (
                     <div 
                       key={res.id} 
-                      onClick={async () => {
-                        if (isProcessingImage) return;
+                      onClick={() => {
                         if (pixabayType === 'video') {
-                          setImage(res.videos?.tiny?.url);
-                          setShowPixabay(false);
+                          // Pexels video files array
+                          const videoUrl = res.video_files?.find(v => v.quality === 'sd' || v.quality === 'hd')?.link || res.video_files?.[0]?.link;
+                          if (videoUrl) setImage(videoUrl);
                         } else {
-                          setIsProcessingImage(true);
-                          try {
-                            const base64 = await fetchAndCompressImage(res.largeImageURL, 800, 0.7);
-                            setImage(base64);
-                            setShowPixabay(false);
-                          } catch (err) {
-                            alert("Erro ao processar imagem.");
-                          }
-                          setIsProcessingImage(false);
+                          // Pexels photos
+                          if (res.src?.large) setImage(res.src.large);
                         }
+                        setShowPixabay(false);
                       }}
-                      className={`relative h-20 bg-slate-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-orange-500 transition group ${isProcessingImage ? 'opacity-50 pointer-events-none' : ''}`}
+                      className="relative h-20 bg-slate-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-emerald-500 transition group"
                     >
                       <img 
-                        src={pixabayType === 'video' ? res.videos?.tiny?.thumbnail : res.webformatURL} 
+                        src={pixabayType === 'video' ? res.image : res.src?.tiny} 
                         className="w-full h-full object-cover group-hover:scale-110 transition duration-500" 
                         alt="preview"
                       />
                       {pixabayType === 'video' && <div className="absolute inset-0 flex items-center justify-center bg-black/30"><Video size={20} className="text-white drop-shadow-md" /></div>}
-                      {isProcessingImage && (
-                         <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center">
-                           <Loader2 className="animate-spin text-white" size={20} />
-                         </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -400,9 +387,9 @@ export default function CreatePost({ user, groupId = null }) {
 
         <div className="flex flex-wrap items-center justify-between gap-y-3 pt-3 border-t border-slate-700/50 relative z-10">
           <div className="flex flex-wrap items-center gap-1 sm:gap-2 flex-1">
-            <button type="button" onClick={() => setShowPixabay(!showPixabay)} className={`text-blue-400 hover:text-blue-300 transition flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg hover:bg-slate-800/50 ${showPixabay ? 'bg-slate-800/50' : ''}`} title="Buscar Mídia (Pixabay)">
+            <button type="button" onClick={() => setShowPixabay(!showPixabay)} className={`text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg hover:bg-slate-800/50 ${showPixabay ? 'bg-slate-800/50' : ''}`} title="Buscar Mídia (Pexels)">
               <Search size={20} />
-              <span className="text-sm font-medium hidden lg:inline">Pixabay</span>
+              <span className="text-sm font-medium hidden lg:inline">Pexels</span>
             </button>
 
             <button type="button" onClick={() => setShowGiphy(!showGiphy)} className={`text-pink-400 hover:text-pink-300 transition flex items-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg hover:bg-slate-800/50 ${showGiphy ? 'bg-slate-800/50' : ''}`} title="Buscar GIF (Giphy)">

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Image as ImageIcon, CheckCircle2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchAndCompressImage } from '../imageProxy';
 
-const PIXABAY_API_KEY = "25211-7a7bd55d7391fa61b9252a565";
+const PEXELS_API_KEY = "yre4KVjRJ3cgE5iavlbnHowKODQ9VtrsRQfeOx7Clu4TFae5ziAe0663";
 
 export default function CoverPicker({ currentCover, onSelectCover }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,19 +14,23 @@ export default function CoverPicker({ currentCover, onSelectCover }) {
 
   useEffect(() => {
     if (isOpen && images.length === 0) {
-      searchPixabay('background abstrato');
+      searchPexels('background abstrato');
     }
   }, [isOpen]);
 
-  const searchPixabay = async (searchQuery) => {
+  const searchPexels = async (searchQuery) => {
     setLoading(true);
     setError(false);
     try {
-      const url = `https://pixabay.com/api/?key=${PIXABAY_API_KEY}&q=${encodeURIComponent(searchQuery)}&image_type=photo&orientation=horizontal&per_page=21&lang=pt`;
-      const res = await fetch(url);
+      const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchQuery)}&orientation=landscape&per_page=21&locale=pt-BR`;
+      const res = await fetch(url, {
+        headers: {
+          Authorization: PEXELS_API_KEY
+        }
+      });
       const data = await res.json();
-      if (data.hits) {
-        setImages(data.hits);
+      if (data.photos) {
+        setImages(data.photos);
       }
     } catch (err) {
       console.error(err);
@@ -39,7 +42,7 @@ export default function CoverPicker({ currentCover, onSelectCover }) {
   const handleSearch = (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (query.trim()) {
-      searchPixabay(query.trim());
+      searchPexels(query.trim());
     }
   };
 
@@ -81,8 +84,8 @@ export default function CoverPicker({ currentCover, onSelectCover }) {
               </button>
               
               <h3 className="font-bold text-lg text-white mb-4 flex items-center gap-2">
-                <Search className="text-orange-500" size={20} />
-                Banco de Imagens Pixabay
+                <Search className="text-emerald-500" size={20} />
+                Banco de Imagens Pexels
               </h3>
 
               <div className="flex gap-2 mb-4 pr-8">
@@ -116,7 +119,7 @@ export default function CoverPicker({ currentCover, onSelectCover }) {
                 </div>
               ) : error ? (
                 <div className="flex items-center justify-center h-48 text-red-400 text-sm">
-                  Erro ao conectar com Pixabay.
+                  Erro ao conectar com Pexels.
                 </div>
               ) : images.length === 0 ? (
                 <div className="flex items-center justify-center h-48 text-slate-500 text-sm">
@@ -127,29 +130,16 @@ export default function CoverPicker({ currentCover, onSelectCover }) {
                   {images.map((img) => (
                     <div 
                       key={img.id}
-                      onClick={async () => {
-                        if (processingImage) return;
-                        setProcessingImage(true);
-                        try {
-                          const base64 = await fetchAndCompressImage(img.largeImageURL, 1200, 0.7);
-                          onSelectCover(base64);
-                          setIsOpen(false);
-                        } catch (err) {
-                          alert('Erro ao processar imagem.');
-                        }
-                        setProcessingImage(false);
+                      onClick={() => {
+                        onSelectCover(img.src.landscape);
+                        setIsOpen(false);
                       }}
                       className={`relative h-24 rounded-lg overflow-hidden cursor-pointer group border-2 transition-all ${
-                        currentCover === img.largeImageURL ? 'border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'border-transparent hover:border-slate-500'
-                      } ${processingImage ? 'opacity-50 pointer-events-none' : ''}`}
+                        currentCover === img.src.landscape ? 'border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'border-transparent hover:border-slate-500'
+                      }`}
                     >
-                      <img src={img.webformatURL} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" alt={img.tags} />
-                      {processingImage && (
-                        <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center">
-                          <Loader2 className="animate-spin text-white drop-shadow-md" size={24} />
-                        </div>
-                      )}
-                      {currentCover === img.largeImageURL && !processingImage && (
+                      <img src={img.src.tiny} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" alt={img.alt} />
+                      {currentCover === img.src.landscape && (
                         <div className="absolute inset-0 bg-orange-500/20 flex items-center justify-center">
                           <CheckCircle2 className="text-white drop-shadow-md" size={32} />
                         </div>
@@ -160,7 +150,7 @@ export default function CoverPicker({ currentCover, onSelectCover }) {
               )}
               
               <div className="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-500 text-center flex items-center justify-center gap-1">
-                Imagens fornecidas por <a href="https://pixabay.com/" target="_blank" rel="noreferrer" className="font-bold text-slate-400 hover:text-white transition">Pixabay</a>
+                Imagens fornecidas por <a href="https://pexels.com/" target="_blank" rel="noreferrer" className="font-bold text-slate-400 hover:text-white transition">Pexels</a>
               </div>
             </div>
           </motion.div>
