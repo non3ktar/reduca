@@ -3,6 +3,7 @@ import { supabase } from '../supabase';
 import { ImagePlus, Send, SmilePlus, BarChart2, X, Plus, Trash2, Loader2, Sparkles, Bot, Search, Video, Image as ImageIcon, Film } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generatePostFromTopic } from '../ai';
+import { fetchAndCompressImage } from '../imageProxy';
 
 const COMMON_EMOJIS = ['👍','😂','❤️','😍','😊','🔥','💡','🚀','🙌','🤔','👏','🎉','💯','👀','📚','✏️'];
 
@@ -28,6 +29,7 @@ export default function CreatePost({ user, groupId = null }) {
   const [pixabayResults, setPixabayResults] = useState([]);
   const [pixabayType, setPixabayType] = useState('image');
   const [isSearchingMedia, setIsSearchingMedia] = useState(false);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
   const PIXABAY_API_KEY = "25211-7a7bd55d7391fa61b9252a565";
 
   // Giphy State
@@ -307,12 +309,24 @@ export default function CreatePost({ user, groupId = null }) {
                   {pixabayResults.map(res => (
                     <div 
                       key={res.id} 
-                      onClick={() => {
-                        const url = pixabayType === 'video' ? res.videos?.tiny?.url : res.largeImageURL;
-                        if (url) setImage(url);
-                        setShowPixabay(false);
+                      onClick={async () => {
+                        if (isProcessingImage) return;
+                        if (pixabayType === 'video') {
+                          setImage(res.videos?.tiny?.url);
+                          setShowPixabay(false);
+                        } else {
+                          setIsProcessingImage(true);
+                          try {
+                            const base64 = await fetchAndCompressImage(res.largeImageURL, 800, 0.7);
+                            setImage(base64);
+                            setShowPixabay(false);
+                          } catch (err) {
+                            alert("Erro ao processar imagem.");
+                          }
+                          setIsProcessingImage(false);
+                        }
                       }}
-                      className="relative h-20 bg-slate-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-orange-500 transition group"
+                      className={`relative h-20 bg-slate-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-orange-500 transition group ${isProcessingImage ? 'opacity-50 pointer-events-none' : ''}`}
                     >
                       <img 
                         src={pixabayType === 'video' ? res.videos?.tiny?.thumbnail : res.webformatURL} 
@@ -320,6 +334,11 @@ export default function CreatePost({ user, groupId = null }) {
                         alt="preview"
                       />
                       {pixabayType === 'video' && <div className="absolute inset-0 flex items-center justify-center bg-black/30"><Video size={20} className="text-white drop-shadow-md" /></div>}
+                      {isProcessingImage && (
+                         <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center">
+                           <Loader2 className="animate-spin text-white" size={20} />
+                         </div>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Image as ImageIcon, CheckCircle2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fetchAndCompressImage } from '../imageProxy';
 
 const PIXABAY_API_KEY = "25211-7a7bd55d7391fa61b9252a565";
 
@@ -10,6 +11,7 @@ export default function CoverPicker({ currentCover, onSelectCover }) {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [processingImage, setProcessingImage] = useState(false);
 
   useEffect(() => {
     if (isOpen && images.length === 0) {
@@ -125,16 +127,29 @@ export default function CoverPicker({ currentCover, onSelectCover }) {
                   {images.map((img) => (
                     <div 
                       key={img.id}
-                      onClick={() => {
-                        onSelectCover(img.largeImageURL);
-                        setIsOpen(false);
+                      onClick={async () => {
+                        if (processingImage) return;
+                        setProcessingImage(true);
+                        try {
+                          const base64 = await fetchAndCompressImage(img.largeImageURL, 1200, 0.7);
+                          onSelectCover(base64);
+                          setIsOpen(false);
+                        } catch (err) {
+                          alert('Erro ao processar imagem.');
+                        }
+                        setProcessingImage(false);
                       }}
                       className={`relative h-24 rounded-lg overflow-hidden cursor-pointer group border-2 transition-all ${
                         currentCover === img.largeImageURL ? 'border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'border-transparent hover:border-slate-500'
-                      }`}
+                      } ${processingImage ? 'opacity-50 pointer-events-none' : ''}`}
                     >
                       <img src={img.webformatURL} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy" alt={img.tags} />
-                      {currentCover === img.largeImageURL && (
+                      {processingImage && (
+                        <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center">
+                          <Loader2 className="animate-spin text-white drop-shadow-md" size={24} />
+                        </div>
+                      )}
+                      {currentCover === img.largeImageURL && !processingImage && (
                         <div className="absolute inset-0 bg-orange-500/20 flex items-center justify-center">
                           <CheckCircle2 className="text-white drop-shadow-md" size={32} />
                         </div>
