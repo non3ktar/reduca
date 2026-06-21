@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../supabase';
-import { Headphones, Edit3, X, Check, Plus } from 'lucide-react';
+import { LayoutTemplate, Edit3, X, Check, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WidgetAudiobook({ currentUser, isAdmin }) {
@@ -126,13 +126,13 @@ export default function WidgetAudiobook({ currentUser, isAdmin }) {
             className="mb-2"
           >
             <div className="flex items-center gap-2 mb-3">
-              <Headphones size={18} className="text-orange-500" />
-              <h3 className="text-sm font-bold text-slate-200">Trocar Audiolivro</h3>
+              <LayoutTemplate size={18} className="text-orange-500" />
+              <h3 className="text-sm font-bold text-slate-200">Editar Conteúdo</h3>
             </div>
             <div className="flex flex-col gap-2">
               <input 
                 type="text" 
-                placeholder="Cole o código <iframe...> do Castbox..." 
+                placeholder="Cole o código <iframe...>..." 
                 value={editInput} 
                 onChange={e => setEditInput(e.target.value)}
                 className="glass-input w-full border-slate-700 focus:border-orange-500 text-xs py-2 px-3"
@@ -157,8 +157,8 @@ export default function WidgetAudiobook({ currentUser, isAdmin }) {
             {embedUrl ? (
               <>
                 <h3 className="font-bold text-slate-200 mb-3 flex items-center gap-2">
-                  <Headphones size={18} className="text-orange-500" />
-                  Audiolivro da Semana
+                  <LayoutTemplate size={18} className="text-orange-500" />
+                  Conteúdo em Destaque
                 </h3>
                 <div className="rounded-xl overflow-hidden shadow-lg border border-slate-700/50 bg-black/20 w-full relative">
                   <iframe 
@@ -173,9 +173,9 @@ export default function WidgetAudiobook({ currentUser, isAdmin }) {
               </>
             ) : (
               <div className="p-6 text-center border-2 border-dashed border-slate-700/50 rounded-xl bg-slate-900/30">
-                <Headphones size={32} className="mx-auto mb-3 text-slate-600" />
-                <h3 className="text-slate-300 font-semibold mb-1 text-sm">Nenhum Audiolivro</h3>
-                <p className="text-xs text-slate-500 mb-4">Adicione o código embed (iframe) do Castbox para os alunos.</p>
+                <LayoutTemplate size={32} className="mx-auto mb-3 text-slate-600" />
+                <h3 className="text-slate-300 font-semibold mb-1 text-sm">Nenhum Conteúdo</h3>
+                <p className="text-xs text-slate-500 mb-4">Adicione qualquer código embed (iframe) para os alunos.</p>
                 <button onClick={() => setIsEditing(true)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium rounded-lg transition-colors inline-flex items-center gap-2">
                   <Plus size={14} /> Adicionar Link
                 </button>
