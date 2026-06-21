@@ -1,6 +1,6 @@
 {
-  "version": "1.0.27",
-  "build": 28,
+  "version": "1.0.28",
+  "build": 29,
   "url": "https://reduca.zonaeducacional.org/reduca-latest.apk",
   "releaseNotes": "Melhorias de layout nas barras laterais e grupos, novos atalhos rápidos e opção de gerenciar (excluir) usuários."
 }

@@ -62,7 +62,7 @@ export default function Sidebar({ currentUser, className = 'hidden md:block' }) 
     <aside className={`space-y-4 pb-24 md:pb-6 ${className}`}>
       <WidgetCalendario currentUser={userProfile} isAdmin={isAdmin} />
       <WidgetNoticias currentUser={userProfile} isAdmin={isAdmin} />
-      <WidgetLibriVox />
+      <WidgetLibriVox currentUser={userProfile} isAdmin={isAdmin} />
       <WidgetAvisos />
       <WidgetTarefas currentUser={userProfile} isAdmin={isAdmin} />
       <AnimatePresence>
