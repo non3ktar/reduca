@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
-import { ShieldAlert, ArrowLeft, Plus, Trash2, Users, LayoutDashboard, Settings, UserCheck, UserX, BadgeCheck, Star, X } from 'lucide-react';
+import { ShieldAlert, ArrowLeft, Plus, Trash2, Users, LayoutDashboard, Settings, UserCheck, UserX, BadgeCheck, Star, X, Download, Mail } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 
@@ -14,6 +14,7 @@ export default function Admin({ user }) {
   const [globalWidgets, setGlobalWidgets] = useState([]);
   const [usersList, setUsersList] = useState([]);
   const [ecosystemApps, setEcosystemApps] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [showAppModal, setShowAppModal] = useState(false);
   const [newApp, setNewApp] = useState({ name: '', description: '', icon_url: '', link_web: '', link_apk: '', link_desktop: '' });
 
@@ -49,6 +50,11 @@ export default function Admin({ user }) {
     if (data) setEcosystemApps(data);
   };
 
+  const fetchLeads = async () => {
+    const { data } = await supabase.from('marketing_leads').select('*').order('created_at', { ascending: false });
+    if (data) setLeads(data);
+  };
+
   useEffect(() => {
     // Check if user is admin
     supabase.from('profiles').select('is_admin').eq('id', user.id).single().then(({ data }) => {
@@ -57,6 +63,7 @@ export default function Admin({ user }) {
         fetchGlobalWidgets();
         fetchUsers();
         fetchEcosystemApps();
+        fetchLeads();
       }
       setLoading(false);
     });
@@ -88,6 +95,20 @@ export default function Admin({ user }) {
       await supabase.from('ecosystem_apps').delete().eq('id', appId);
       fetchEcosystemApps();
     }
+  };
+
+  const handleExportCSV = () => {
+    if (leads.length === 0) return;
+    const headers = ['Nome,Email,WhatsApp,Data'];
+    const rows = leads.map(l => `${l.name || ''},${l.email || ''},${l.whatsapp || ''},${new Date(l.created_at).toLocaleDateString()}`);
+    const csvContent = "data:text/csv;charset=utf-8," + headers.concat(rows).join("\\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "reduca_leads.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const toggleVerifiedStatus = async (userId, currentStatus) => {
@@ -218,6 +239,12 @@ export default function Admin({ user }) {
             className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'arsenal' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-600'}`}
           >
             <LayoutDashboard size={18} /> Arsenal de Apps
+          </button>
+          <button 
+            onClick={() => setActiveTab('leads')} 
+            className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'leads' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-600'}`}
+          >
+            <Mail size={18} /> Contatos (Leads)
           </button>
         </div>
 
@@ -529,6 +556,52 @@ export default function Admin({ user }) {
                   <button type="submit" className="flex-1 py-3 px-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition">Salvar App</button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Leads */}
+        {activeTab === 'leads' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-slate-50">Contatos Coletados ({leads.length})</h2>
+              <button 
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold transition-colors"
+              >
+                <Download size={18} />
+                Exportar CSV
+              </button>
+            </div>
+            
+            <div className="glass-card overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-800/50 border-b border-slate-700/50">
+                      <th className="p-4 font-medium text-slate-300">Nome</th>
+                      <th className="p-4 font-medium text-slate-300">E-mail</th>
+                      <th className="p-4 font-medium text-slate-300">WhatsApp</th>
+                      <th className="p-4 font-medium text-slate-300">Data</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map(lead => (
+                      <tr key={lead.id} className="border-b border-slate-700/50 hover:bg-slate-800/30 transition-colors">
+                        <td className="p-4 text-slate-200 font-medium">{lead.name}</td>
+                        <td className="p-4 text-sm text-slate-400">{lead.email}</td>
+                        <td className="p-4 text-sm text-emerald-400 font-medium">{lead.whatsapp}</td>
+                        <td className="p-4 text-sm text-slate-500">{new Date(lead.created_at).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                    {leads.length === 0 && (
+                      <tr>
+                        <td colSpan="4" className="p-8 text-center text-slate-500">Nenhum contato coletado ainda.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
