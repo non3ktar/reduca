@@ -243,16 +243,28 @@ export default function VisualNovelMales() {
         {/* Choices / Actions */}
         <div className="w-full flex flex-col gap-3">
           {currentNode.isEnd ? (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              onClick={restartGame}
-              className={`flex items-center justify-center gap-2 w-full sm:w-auto self-center px-8 py-4 rounded-xl font-bold text-white transition-all transform hover:scale-105 shadow-xl border ${currentNode.success ? 'bg-emerald-600 hover:bg-emerald-500 border-emerald-400 shadow-emerald-500/30' : 'bg-red-600 hover:bg-red-500 border-red-400 shadow-red-500/30'}`}
-            >
-              {currentNode.success ? <CheckCircle2 size={24} /> : <ShieldAlert size={24} />}
-              Jogar Novamente
-            </motion.button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4 w-full">
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 }}
+                onClick={restartGame}
+                className={`flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-white transition-all transform hover:scale-105 shadow-xl border ${currentNode.success ? 'bg-emerald-600 hover:bg-emerald-500 border-emerald-400 shadow-emerald-500/30' : 'bg-red-600 hover:bg-red-500 border-red-400 shadow-red-500/30'}`}
+              >
+                {currentNode.success ? <CheckCircle2 size={24} /> : <ShieldAlert size={24} />}
+                Jogar Novamente
+              </motion.button>
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2 }}
+                onClick={() => navigate('/')}
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-slate-100 bg-slate-800/80 backdrop-blur-md hover:bg-slate-700 border border-slate-600 shadow-xl transition-all transform hover:scale-105"
+              >
+                <ArrowLeft size={24} />
+                Voltar ao Reduca
+              </motion.button>
+            </div>
           ) : (
             <AnimatePresence>
               {currentNode.choices.map((choice, index) => (
