@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { GraduationCap, Plus, ArrowLeft, Users, Copy, Trash2, CheckCircle2, MoreHorizontal, LayoutDashboard, Sparkles } from 'lucide-react';
+import { GraduationCap, Plus, ArrowLeft, Users, Copy, Trash2, CheckCircle2, MoreHorizontal, LayoutDashboard, Sparkles, Upload } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import AppDrawer from '../components/AppDrawer';
 import Sidebar from '../components/Sidebar';
@@ -19,8 +19,8 @@ export default function Turmas({ user }) {
   const [selectedTurma, setSelectedTurma] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTurmaName, setNewTurmaName] = useState('');
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [manualName, setManualName] = useState('');
+  const [manualEmail, setManualEmail] = useState('');
 
   const handleCreateTurma = (e) => {
     e.preventDefault();
@@ -40,20 +40,14 @@ export default function Turmas({ user }) {
     setSelectedTurma(newTurma); // Open it immediately
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(`https://reduca.com/invite/t/${selectedTurma.id}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleInvite = (e) => {
+  const handleAddManual = (e) => {
     e.preventDefault();
-    if (!inviteEmail.includes('@')) return;
+    if (!manualName.trim()) return;
 
     const newMember = {
       id: Date.now(),
-      name: inviteEmail.split('@')[0],
-      email: inviteEmail,
+      name: manualName.trim(),
+      email: manualEmail.trim() || '',
       role: 'Aluno'
     };
 
@@ -64,7 +58,53 @@ export default function Turmas({ user }) {
 
     setSelectedTurma(updatedTurma);
     setTurmas(turmas.map(t => t.id === selectedTurma.id ? updatedTurma : t));
-    setInviteEmail('');
+    
+    setManualName('');
+    setManualEmail('');
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const rows = text.split('\n');
+      const newMembers = [];
+      
+      rows.forEach((row, index) => {
+        if (row.trim() === '') return;
+        const columns = row.split(',');
+        if (columns.length >= 1) {
+          const name = columns[0].trim();
+          const email = columns[1] ? columns[1].trim() : '';
+          
+          if (name && name.toLowerCase() !== 'nome' && name.toLowerCase() !== 'name') {
+            newMembers.push({
+              id: Date.now() + index,
+              name: name,
+              email: email,
+              role: 'Aluno'
+            });
+          }
+        }
+      });
+
+      if (newMembers.length > 0) {
+        const updatedTurma = {
+          ...selectedTurma,
+          members: [...selectedTurma.members, ...newMembers]
+        };
+        setSelectedTurma(updatedTurma);
+        setTurmas(turmas.map(t => t.id === selectedTurma.id ? updatedTurma : t));
+        alert(`${newMembers.length} alunos importados com sucesso!`);
+      } else {
+        alert("Nenhum aluno encontrado no arquivo. Use o formato: Nome, Email");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null; // reset input
   };
 
   const handleRemoveMember = (memberId) => {
@@ -193,41 +233,57 @@ export default function Turmas({ user }) {
               {/* Área de Convite */}
               <div className="glass-card p-6 rounded-2xl space-y-6">
                 <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                  <Users className="text-emerald-500" /> Adicionar pessoas
+                  <Users className="text-emerald-500" /> Adicionar Alunos
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400">Convidar via link</label>
-                    <button 
-                      onClick={handleCopyLink}
-                      className={`w-full flex items-center justify-center gap-2 font-bold py-2.5 px-4 rounded-xl transition ${
-                        copied ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      {copied ? <CheckCircle2 size={18} /> : <Link className="w-4 h-4" />}
-                      {copied ? 'Link copiado!' : 'Copiar link'}
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400">Convidar por E-mail</label>
-                    <form onSubmit={handleInvite} className="flex gap-2">
+                  {/* Adicionar Manualmente */}
+                  <div className="space-y-4">
+                    <label className="block text-sm font-bold text-slate-600 dark:text-slate-300">Adicionar 1 a 1</label>
+                    <form onSubmit={handleAddManual} className="space-y-3">
+                      <input 
+                        type="text" 
+                        placeholder="Nome do aluno (Obrigatório)" 
+                        value={manualName}
+                        onChange={(e) => setManualName(e.target.value)}
+                        className="glass-input w-full rounded-xl px-4 py-2 text-sm"
+                        required
+                      />
                       <input 
                         type="email" 
-                        placeholder="E-mail do aluno" 
-                        value={inviteEmail}
-                        onChange={(e) => setInviteEmail(e.target.value)}
+                        placeholder="E-mail do aluno (Opcional)" 
+                        value={manualEmail}
+                        onChange={(e) => setManualEmail(e.target.value)}
                         className="glass-input w-full rounded-xl px-4 py-2 text-sm"
                       />
                       <button 
                         type="submit"
-                        disabled={!inviteEmail.includes('@')}
-                        className="bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white px-4 py-2 rounded-xl font-bold transition whitespace-nowrap"
+                        disabled={!manualName.trim()}
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white px-4 py-2 rounded-xl font-bold transition whitespace-nowrap shadow-md"
                       >
-                        Enviar
+                        Adicionar Aluno
                       </button>
                     </form>
+                  </div>
+                  
+                  {/* Importar via CSV */}
+                  <div className="space-y-4">
+                    <label className="block text-sm font-bold text-slate-600 dark:text-slate-300">Importar lista (CSV)</label>
+                    <div className="bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-6 text-center flex flex-col items-center justify-center h-[140px]">
+                      <Upload className="text-slate-400 mb-2" size={28} />
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 max-w-[200px]">
+                        Arquivo CSV com colunas: <br/><span className="font-mono text-emerald-600 dark:text-emerald-400">Nome, Email</span>
+                      </p>
+                      <label className="bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 px-4 py-2 rounded-xl font-bold transition cursor-pointer text-sm shadow-md">
+                        Selecionar Arquivo
+                        <input 
+                          type="file" 
+                          accept=".csv" 
+                          onChange={handleFileUpload} 
+                          className="hidden" 
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
