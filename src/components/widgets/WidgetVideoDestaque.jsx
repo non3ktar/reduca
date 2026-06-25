@@ -172,7 +172,7 @@ export default function WidgetVideoDestaque({ currentUser, isAdmin }) {
                 <PlayCircle size={32} className="mx-auto mb-3 text-slate-600" />
                 <h3 className="text-slate-300 font-semibold mb-1">Nenhum Vídeo em Destaque</h3>
                 <p className="text-xs text-slate-500 mb-4">Apenas administradores podem adicionar um vídeo aqui.</p>
-                <button onClick={() => setIsEditing(true)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium rounded-lg transition-colors inline-flex items-center gap-2">
+                <button onClick={() => setIsEditing(true)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg transition-colors inline-flex items-center gap-2">
                   <Plus size={14} /> Adicionar Vídeo
                 </button>
               </div>
