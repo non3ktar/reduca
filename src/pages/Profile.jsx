@@ -178,25 +178,40 @@ export default function Profile({ currentUser }) {
           </div>
         </div>
         <div className="px-6 pb-8 relative">
-          <div className="flex justify-between items-end -mt-16 mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end -mt-16 mb-4 gap-4">
             <img 
               src={profileUser.avatar} 
               alt={profileUser.name} 
-              className="w-32 h-32 rounded-full border-4 border-slate-900 object-cover bg-slate-800 shadow-xl" 
+              className="w-32 h-32 rounded-full border-4 border-slate-100 dark:border-slate-900 object-cover bg-slate-200 dark:bg-slate-800 shadow-xl" 
             />
-            {!isOwnProfile && (
-              <button 
-                onClick={handleFollowToggle}
-                disabled={followLoading}
-                className={`px-8 py-2.5 rounded-full font-bold shadow-lg transition ${
-                  isFollowing 
-                    ? 'bg-slate-700 hover:bg-red-500 hover:text-white text-white shadow-slate-900/20'
-                    : 'bg-orange-600 hover:bg-orange-500 text-white shadow-orange-500/20'
-                }`}
-              >
-                {isFollowing ? 'Seguindo' : 'Seguir'}
-              </button>
-            )}
+            
+            <div className="flex items-center gap-4 w-full sm:w-auto overflow-x-auto no-scrollbar pb-2 sm:pb-0">
+              {/* Atalhos Rápidos Neumórficos */}
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-100 dark:bg-slate-800 shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155]">
+                <Link to="/" title="Home" className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f172a,-4px_-4px_8px_#334155] hover:text-orange-500 hover:scale-105 active:shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155] transition-all shrink-0"><Home size={20} /></Link>
+                <Link to="/blog" title="Blog" className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f172a,-4px_-4px_8px_#334155] hover:text-purple-500 hover:scale-105 active:shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155] transition-all shrink-0"><BookOpen size={20} /></Link>
+                <Link to="/forum" title="Fórum" className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f172a,-4px_-4px_8px_#334155] hover:text-blue-500 hover:scale-105 active:shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155] transition-all shrink-0"><MessageCircle size={20} /></Link>
+                <Link to="/escambo" title="Escambo" className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f172a,-4px_-4px_8px_#334155] hover:text-emerald-500 hover:scale-105 active:shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155] transition-all shrink-0"><RefreshCcw size={20} /></Link>
+                <Link to="/groups" title="Grupos" className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f172a,-4px_-4px_8px_#334155] hover:text-pink-500 hover:scale-105 active:shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155] transition-all shrink-0"><Users size={20} /></Link>
+                <Link to="/correio" title="Correio" className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f172a,-4px_-4px_8px_#334155] hover:text-amber-500 hover:scale-105 active:shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155] transition-all shrink-0"><Mail size={20} /></Link>
+                <Link to="/jogoforca" title="Forca" className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f172a,-4px_-4px_8px_#334155] hover:text-rose-500 hover:scale-105 active:shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155] transition-all shrink-0"><Gamepad2 size={20} /></Link>
+                <Link to="/males" title="Malês" className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shadow-[4px_4px_8px_#cbd5e1,-4px_-4px_8px_#ffffff] dark:shadow-[4px_4px_8px_#0f172a,-4px_-4px_8px_#334155] hover:text-indigo-500 hover:scale-105 active:shadow-[inset_4px_4px_8px_#cbd5e1,inset_-4px_-4px_8px_#ffffff] dark:active:shadow-[inset_4px_4px_8px_#0f172a,inset_-4px_-4px_8px_#334155] transition-all shrink-0"><Swords size={20} /></Link>
+              </div>
+
+              {!isOwnProfile && (
+                <button 
+                  onClick={handleFollowToggle}
+                  disabled={followLoading}
+                  className={`px-8 py-2.5 rounded-full font-bold shadow-lg transition shrink-0 ${
+                    isFollowing 
+                      ? 'bg-slate-700 hover:bg-red-500 hover:text-white text-white shadow-slate-900/20'
+                      : 'bg-orange-600 hover:bg-orange-500 text-white shadow-orange-500/20'
+                  }`}
+                >
+                  {isFollowing ? 'Seguindo' : 'Seguir'}
+                </button>
+              )}
+            </div>
           </div>
           
           <h1 className="text-3xl font-bold text-slate-100 flex items-center gap-2">
@@ -265,19 +280,7 @@ export default function Profile({ currentUser }) {
         </div>
       </motion.div>
 
-      {/* Atalhos Rápidos */}
-      <div className="relative mb-8 p-1 rounded-3xl bg-gradient-to-r from-orange-500/40 via-purple-500/40 to-blue-500/40 shadow-xl">
-        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl py-3 px-4 flex items-center justify-between sm:justify-center gap-3 sm:gap-5 overflow-x-auto no-scrollbar rounded-[20px]">
-          <Link to="/" title="Home" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-orange-500/40"><Home size={22} /></Link>
-          <Link to="/blog" title="Blog" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-purple-500 hover:text-white dark:hover:bg-purple-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-purple-500/40"><BookOpen size={22} /></Link>
-          <Link to="/forum" title="Fórum" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-blue-500/40"><MessageCircle size={22} /></Link>
-          <Link to="/escambo" title="Escambo" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-emerald-500/40"><RefreshCcw size={22} /></Link>
-          <Link to="/groups" title="Grupos" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-pink-500 hover:text-white dark:hover:bg-pink-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-pink-500/40"><Users size={22} /></Link>
-          <Link to="/correio" title="Correio" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-amber-500/40"><Mail size={22} /></Link>
-          <Link to="/jogoforca" title="Forca" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-rose-500 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-rose-500/40"><Gamepad2 size={22} /></Link>
-          <Link to="/males" title="Malês" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-indigo-500/40"><Swords size={22} /></Link>
-        </div>
-      </div>
+
 
       {/* User Posts */}
       <h2 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
