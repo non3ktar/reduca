@@ -41,7 +41,7 @@ export default function Turmas({ user }) {
   };
 
   const renderStep1 = () => (
-    <div className="flex h-screen bg-[#1A1B23] text-white overflow-hidden">
+    <div className="flex h-screen bg-slate-50 dark:bg-[#1A1B23] text-slate-800 dark:text-white overflow-hidden">
       {/* Esquerda - Formulário */}
       <motion.div 
         className="w-full lg:w-5/12 flex flex-col p-8 sm:p-12 z-10"
@@ -50,32 +50,32 @@ export default function Turmas({ user }) {
         animate="visible"
         exit="exit"
       >
-        <button onClick={() => navigate('/')} className="flex items-center text-slate-400 hover:text-white mb-12 w-fit transition">
+        <button onClick={() => navigate('/')} className="flex items-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white mb-12 w-fit transition">
           <ChevronLeft size={20} className="mr-1" />
           Voltar
         </button>
 
         <h1 className="text-3xl font-bold mb-4">Criar uma turma</h1>
-        <p className="text-slate-300 mb-8 text-sm leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-300 mb-8 text-sm leading-relaxed">
           Com as turmas, fica mais fácil compartilhar e atribuir aulas, atividades e designs aos seus alunos.
         </p>
 
         <div className="mb-6">
-          <label className="block text-xs font-bold text-slate-300 mb-2">Escolha um nome para a turma</label>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Escolha um nome para a turma</label>
           <input 
             type="text" 
             placeholder="Ex: História do 5º ano" 
             value={className}
             onChange={(e) => setClassName(e.target.value)}
-            className="w-full bg-[#1A1B23] border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition"
+            className="w-full bg-white dark:bg-[#1A1B23] border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition shadow-sm dark:shadow-none"
           />
-          <p className="text-xs text-slate-500 mt-2">Pode ser o nome de uma matéria ou de uma turma sua.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">Pode ser o nome de uma matéria ou de uma turma sua.</p>
         </div>
 
         <button 
           onClick={handleContinue}
           disabled={!className.trim()}
-          className="w-full bg-[#8B5CF6] hover:bg-[#7C3AED] disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold py-3 px-4 rounded-xl transition"
+          className="w-full bg-[#8B5CF6] hover:bg-[#7C3AED] disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold py-3 px-4 rounded-xl transition shadow-md disabled:shadow-none"
         >
           Continuar
         </button>
@@ -119,82 +119,75 @@ export default function Turmas({ user }) {
   );
 
   const renderStep2 = () => (
-    <div className="flex h-screen bg-[#1A1B23] text-white overflow-hidden">
+    <div className="flex h-screen bg-slate-50 dark:bg-[#1A1B23] text-slate-800 dark:text-white overflow-hidden">
       {/* Esquerda - Formulário */}
       <motion.div 
-        className="w-full lg:w-5/12 flex flex-col p-8 sm:p-12 z-10 border-r border-slate-800 overflow-y-auto"
+        className="w-full lg:w-5/12 flex flex-col p-8 sm:p-12 z-10 border-r border-slate-200 dark:border-slate-800 overflow-y-auto"
         variants={panelVariants}
         initial="hidden"
         animate="visible"
         exit="exit"
       >
-        <button onClick={() => setStep(1)} className="flex items-center text-slate-400 hover:text-white mb-8 w-fit transition">
+        <button onClick={() => setStep(1)} className="flex items-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white mb-8 w-fit transition">
           <ChevronLeft size={20} className="mr-1" />
-          <h1 className="text-2xl font-bold text-white">Convide <span className="text-[#8B5CF6]">pessoas</span> para a sua turma</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Convide <span className="text-[#8B5CF6]">pessoas</span> para a sua turma</h1>
         </button>
 
-        <p className="text-slate-300 mb-8 text-sm leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-300 mb-8 text-sm leading-relaxed">
           Você pode convidar qualquer pessoa da sua escola. Se essa pessoa ainda não estiver no Reduca, o seu convite dará a ela acesso grátis.
         </p>
 
         {/* Via Link */}
         <div className="mb-6">
-          <label className="block text-xs font-bold text-slate-300 mb-2">Convidar via link</label>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Convidar via link</label>
           <button 
             onClick={handleCopyLink}
-            className={`w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-xl transition ${
+            className={`w-full flex items-center justify-center gap-2 font-bold py-3 px-4 rounded-xl transition shadow-md ${
               copied ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : 'bg-[#8B5CF6] hover:bg-[#7C3AED] text-white'
             }`}
           >
             {copied ? <CheckCircle2 size={20} /> : <LinkIcon size={20} />}
             {copied ? 'Link copiado!' : 'Copiar link de convite'}
           </button>
-          <div className="mt-4 bg-[#232431] p-4 rounded-xl text-xs text-slate-300 border border-[#303348]">
-            Qualquer pessoa que receber este link poderá acessar e entrar na turma. O link é válido por 30 dias. <button className="underline hover:text-white font-semibold">Desativar o link.</button>
+          <div className="mt-4 bg-slate-100 dark:bg-[#232431] p-4 rounded-xl text-xs text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#303348]">
+            Qualquer pessoa que receber este link poderá acessar e entrar na turma. O link é válido por 30 dias. <button className="underline hover:text-slate-900 dark:hover:text-white font-semibold">Desativar o link.</button>
           </div>
         </div>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="h-px bg-slate-700 flex-1"></div>
-          <span className="text-slate-500 text-xs font-bold">OU</span>
-          <div className="h-px bg-slate-700 flex-1"></div>
+          <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+          <span className="text-slate-400 dark:text-slate-500 text-xs font-bold">OU</span>
+          <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
         </div>
 
         {/* Via Email */}
         <div className="mb-6">
-          <label className="block text-xs font-bold text-slate-300 mb-2">Convidar por e-mail</label>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Convidar por e-mail</label>
           <input 
             type="email" 
-            placeholder="Adicione pessoas, turmas e e-mails" 
+            placeholder="Adicione e-mails separados por vírgula" 
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
-            className="w-full bg-[#1A1B23] border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#8B5CF6] mb-3 transition"
+            className="w-full bg-white dark:bg-[#1A1B23] border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 text-slate-800 dark:text-white focus:outline-none focus:border-[#8B5CF6] mb-3 transition shadow-sm dark:shadow-none"
           />
           <button 
+            onClick={() => {
+              if (inviteEmail.includes('@')) {
+                setMembers([...members, { id: Date.now(), name: inviteEmail.split('@')[0], email: inviteEmail, role: 'Aluno' }]);
+                setInviteEmail('');
+                setStep(3);
+              }
+            }}
             disabled={!inviteEmail.includes('@')}
-            className="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition"
+            className="w-full bg-[#8B5CF6] hover:bg-[#7C3AED] disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition shadow-md disabled:shadow-none mt-2"
           >
-            Enviar convites
+            Enviar convites e Continuar
           </button>
-        </div>
-
-        {/* Outras formas */}
-        <div className="mb-8">
-          <label className="block text-xs font-bold text-slate-300 mb-2">Convidar de outra forma</label>
-          <div className="grid grid-cols-2 gap-3">
-            <button className="flex items-center justify-center gap-2 bg-[#232431] hover:bg-slate-700 border border-slate-700 text-white font-medium py-3 px-4 rounded-xl transition text-sm">
-              <Hash size={18} /> Via código
-            </button>
-            <button className="flex items-center justify-center gap-2 bg-[#232431] hover:bg-slate-700 border border-slate-700 text-white font-medium py-3 px-4 rounded-xl transition text-sm">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Classroom_Logo.png" alt="Classroom" className="w-5 h-5 object-contain" />
-              Sala de Aula
-            </button>
-          </div>
         </div>
 
         <button 
           onClick={handleFinish}
-          className="mt-auto w-full bg-transparent hover:bg-slate-800 text-slate-300 hover:text-white font-bold py-3 px-4 rounded-xl transition"
+          className="mt-auto w-full bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-bold py-3 px-4 rounded-xl transition"
         >
           Pular por enquanto
         </button>
@@ -250,43 +243,43 @@ export default function Turmas({ user }) {
   );
 
   const renderStep3 = () => (
-    <div className="min-h-screen bg-[#111218] text-white p-4 sm:p-8">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#111218] text-slate-800 dark:text-white p-4 sm:p-8 transition-colors">
       <div className="max-w-5xl mx-auto">
         {/* Header Breadcrumb */}
-        <div className="flex items-center text-sm font-medium text-slate-400 mb-8 sm:mb-12">
-          <button onClick={() => navigate('/')} className="hover:text-white transition">Início</button>
+        <div className="flex items-center text-sm font-medium text-slate-500 dark:text-slate-400 mb-8 sm:mb-12">
+          <button onClick={() => navigate('/')} className="hover:text-slate-900 dark:hover:text-white transition">Início</button>
           <span className="mx-2">›</span>
-          <button onClick={() => setStep(1)} className="hover:text-white transition">Turmas</button>
+          <button onClick={() => setStep(1)} className="hover:text-slate-900 dark:hover:text-white transition">Turmas</button>
           <span className="mx-2">›</span>
-          <span className="text-white">{className || 'Nova Turma'}</span>
+          <span className="text-slate-800 dark:text-white">{className || 'Nova Turma'}</span>
         </div>
 
         {/* Título Central */}
         <div className="flex flex-col items-center justify-center mb-12 sm:mb-16">
-          <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center text-2xl font-bold mb-4 shadow-lg shadow-emerald-500/20">
+          <div className="w-16 h-16 bg-emerald-500 dark:bg-emerald-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg shadow-emerald-500/20">
             {members.length}
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white text-center">{className || 'Nova Turma'}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-white text-center">{className || 'Nova Turma'}</h1>
         </div>
 
         {/* Header Tabela e Botão */}
         <div className="flex flex-col sm:flex-row justify-end items-center mb-4 gap-4">
           <button 
             onClick={() => setStep(2)}
-            className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold py-2 px-6 rounded-xl transition flex items-center gap-2 w-full sm:w-auto justify-center"
+            className="bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold py-2 px-6 rounded-xl shadow-md transition flex items-center gap-2 w-full sm:w-auto justify-center"
           >
              Adicionar pessoas
           </button>
         </div>
 
         {/* Tabela */}
-        <div className="bg-[#1A1B23] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="bg-white dark:bg-[#1A1B23] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xl dark:shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-[#111218] text-slate-400 border-b border-slate-800">
+              <thead className="bg-slate-50 dark:bg-[#111218] text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="px-6 py-4 font-semibold w-12">
-                    <div className="w-4 h-4 rounded-full border border-slate-600"></div>
+                    <div className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600"></div>
                   </th>
                   <th className="px-6 py-4 font-semibold">Nome</th>
                   <th className="px-6 py-4 font-semibold">E-mail</th>
@@ -294,41 +287,54 @@ export default function Turmas({ user }) {
                   <th className="px-6 py-4 font-semibold w-16"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                 {members.map((member) => (
-                  <tr key={member.id} className="hover:bg-slate-800/30 transition group">
+                  <tr key={member.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition group">
                     <td className="px-6 py-4">
-                      <div className="w-4 h-4 rounded-full border border-slate-600 flex-shrink-0 cursor-pointer hover:bg-slate-700"></div>
+                      <div className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600 flex-shrink-0 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700"></div>
                     </td>
                     <td className="px-6 py-4 flex items-center gap-3">
                       {member.avatar ? (
-                        <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full bg-slate-700 object-cover border border-slate-600" />
+                        <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 object-cover border border-slate-200 dark:border-slate-600" />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center font-bold text-white shadow-inner">
+                        <div className="w-8 h-8 rounded-full bg-orange-500 dark:bg-orange-600 flex items-center justify-center font-bold text-white shadow-inner">
                           {member.name.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <span className="font-medium text-slate-200">{member.name}</span>
+                      <span className="font-medium text-slate-800 dark:text-slate-200">{member.name}</span>
                     </td>
-                    <td className="px-6 py-4 text-slate-400">{member.email || '-'}</td>
-                    <td className="px-6 py-4 text-slate-300">
-                      <select className="bg-transparent border-none focus:ring-0 cursor-pointer hover:bg-slate-800 px-2 py-1 rounded text-sm outline-none">
-                        <option value="Admin da turma" className="bg-[#1A1B23]">Admin da turma</option>
-                        <option value="Aluno" className="bg-[#1A1B23]">Aluno</option>
-                        <option value="Professor adjunto" className="bg-[#1A1B23]">Professor adjunto</option>
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{member.email || '-'}</td>
+                    <td className="px-6 py-4 text-slate-700 dark:text-slate-300">
+                      <select className="bg-transparent border-none focus:ring-0 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 px-2 py-1 rounded text-sm outline-none">
+                        <option value="Admin da turma" className="bg-white dark:bg-[#1A1B23]">Admin da turma</option>
+                        <option value="Aluno" className="bg-white dark:bg-[#1A1B23]">Aluno</option>
+                        <option value="Professor adjunto" className="bg-white dark:bg-[#1A1B23]">Professor adjunto</option>
                       </select>
                     </td>
                     <td className="px-6 py-4 relative group/menu">
-                      <button className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition opacity-0 group-hover:opacity-100 focus:opacity-100">
+                      <button className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition opacity-0 group-hover:opacity-100 focus:opacity-100">
                         <MoreHorizontal size={20} />
                       </button>
                       
                       {/* Dropdown Menu Invisível */}
-                      <div className="absolute right-8 top-10 w-48 bg-[#232431] border border-slate-700 rounded-xl shadow-xl z-10 hidden group-hover/menu:block hover:block">
-                        <button className="w-full text-left px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white transition flex items-center gap-2 rounded-t-xl text-sm">
+                      <div className="absolute right-8 top-10 w-48 bg-white dark:bg-[#232431] border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-10 hidden group-hover/menu:block hover:block">
+                        <button 
+                          onClick={() => {
+                            navigator.clipboard.writeText(member.email);
+                            alert("E-mail copiado!");
+                          }}
+                          className="w-full text-left px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-2 rounded-t-xl text-sm"
+                        >
                            <Copy size={16} /> Copiar e-mail
                         </button>
-                        <button className="w-full text-left px-4 py-3 text-red-400 hover:bg-slate-700 hover:text-red-300 transition flex items-center gap-2 rounded-b-xl text-sm border-t border-slate-700">
+                        <button 
+                          onClick={() => {
+                            if (window.confirm(`Remover ${member.name} da turma?`)) {
+                              setMembers(members.filter(m => m.id !== member.id));
+                            }
+                          }}
+                          className="w-full text-left px-4 py-3 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-700 hover:text-red-600 dark:hover:text-red-300 transition flex items-center gap-2 rounded-b-xl text-sm border-t border-slate-100 dark:border-slate-700"
+                        >
                            <Trash2 size={16} /> Remover da turma
                         </button>
                       </div>
