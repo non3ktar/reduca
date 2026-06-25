@@ -13,7 +13,7 @@ import WidgetArtigos from '../components/widgets/WidgetArtigos';
 import WidgetEscambo from '../components/widgets/WidgetEscambo';
 import WidgetVideoDestaque from '../components/widgets/WidgetVideoDestaque';
 import WidgetAudiobook from '../components/widgets/WidgetAudiobook';
-import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays, RefreshCcw, Mail, Gamepad2, Swords } from 'lucide-react';
+import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays, RefreshCcw, Mail, Gamepad2, Swords, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppDrawer from '../components/AppDrawer';
 import { App } from '@capacitor/app';
@@ -126,6 +126,7 @@ export default function Home({ user }) {
             <Link to="/correio" className={`transition-colors ${window.location.pathname.startsWith('/correio') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Correio Interno"><Mail size={24} /></Link>
             <Link to="/jogoforca" className={`transition-colors ${window.location.pathname.startsWith('/jogoforca') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Palavra Secreta"><Gamepad2 size={24} /></Link>
             <Link to="/males" className={`transition-colors ${window.location.pathname.startsWith('/males') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Malês - VN"><Swords size={24} /></Link>
+            <Link to="/turmas" className={`transition-colors ${window.location.pathname.startsWith('/turmas') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Turmas"><GraduationCap size={24} /></Link>
             
             <div className="relative">
               <button onClick={() => {setShowNotif(!showNotif); setShowMsg(false)}} className="text-slate-300 hover:text-white transition-colors"><Bell size={24} /></button>
