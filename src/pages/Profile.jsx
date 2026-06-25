@@ -266,15 +266,17 @@ export default function Profile({ currentUser }) {
       </motion.div>
 
       {/* Atalhos Rápidos */}
-      <div className="glass-card mb-8 py-3 px-4 flex items-center justify-between sm:justify-center gap-6 overflow-x-auto no-scrollbar border border-slate-700/50 rounded-2xl shadow-lg">
-        <Link to="/" title="Home" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Home size={22} /></Link>
-        <Link to="/blog" title="Blog" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><BookOpen size={22} /></Link>
-        <Link to="/forum" title="Fórum" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><MessageCircle size={22} /></Link>
-        <Link to="/escambo" title="Escambo" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><RefreshCcw size={22} /></Link>
-        <Link to="/groups" title="Grupos" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Users size={22} /></Link>
-        <Link to="/correio" title="Correio" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Mail size={22} /></Link>
-        <Link to="/jogoforca" title="Forca" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Gamepad2 size={22} /></Link>
-        <Link to="/males" title="Malês" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Swords size={22} /></Link>
+      <div className="relative mb-8 p-1 rounded-3xl bg-gradient-to-r from-orange-500/40 via-purple-500/40 to-blue-500/40 shadow-xl">
+        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl py-3 px-4 flex items-center justify-between sm:justify-center gap-3 sm:gap-5 overflow-x-auto no-scrollbar rounded-[20px]">
+          <Link to="/" title="Home" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-orange-500/40"><Home size={22} /></Link>
+          <Link to="/blog" title="Blog" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-purple-500 hover:text-white dark:hover:bg-purple-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-purple-500/40"><BookOpen size={22} /></Link>
+          <Link to="/forum" title="Fórum" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-blue-500/40"><MessageCircle size={22} /></Link>
+          <Link to="/escambo" title="Escambo" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-emerald-500/40"><RefreshCcw size={22} /></Link>
+          <Link to="/groups" title="Grupos" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-pink-500 hover:text-white dark:hover:bg-pink-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-pink-500/40"><Users size={22} /></Link>
+          <Link to="/correio" title="Correio" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-amber-500/40"><Mail size={22} /></Link>
+          <Link to="/jogoforca" title="Forca" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-rose-500 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-rose-500/40"><Gamepad2 size={22} /></Link>
+          <Link to="/males" title="Malês" className="flex flex-col items-center justify-center w-12 h-12 shrink-0 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white hover:-translate-y-1 transition-all shadow-sm hover:shadow-indigo-500/40"><Swords size={22} /></Link>
+        </div>
       </div>
 
       {/* User Posts */}
