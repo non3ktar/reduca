@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { ArrowLeft, Edit3, MapPin, Briefcase, Calendar, X, BadgeCheck, Trophy, MessageSquare, Heart, Mail } from 'lucide-react';
+import { ArrowLeft, Edit3, MapPin, Briefcase, Calendar, X, BadgeCheck, Trophy, MessageSquare, Heart, Mail, Home, BookOpen, MessageCircle, RefreshCcw, Users, Gamepad2, Swords } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../components/ThemeToggle';
 import Post from '../components/Post';
@@ -264,6 +264,18 @@ export default function Profile({ currentUser }) {
           )}
         </div>
       </motion.div>
+
+      {/* Atalhos Rápidos */}
+      <div className="glass-card mb-8 py-3 px-4 flex items-center justify-between sm:justify-center gap-6 overflow-x-auto no-scrollbar border border-slate-700/50 rounded-2xl shadow-lg">
+        <Link to="/" title="Home" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Home size={22} /></Link>
+        <Link to="/blog" title="Blog" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><BookOpen size={22} /></Link>
+        <Link to="/forum" title="Fórum" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><MessageCircle size={22} /></Link>
+        <Link to="/escambo" title="Escambo" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><RefreshCcw size={22} /></Link>
+        <Link to="/groups" title="Grupos" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Users size={22} /></Link>
+        <Link to="/correio" title="Correio" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Mail size={22} /></Link>
+        <Link to="/jogoforca" title="Forca" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Gamepad2 size={22} /></Link>
+        <Link to="/males" title="Malês" className="text-slate-300 hover:text-orange-500 hover:scale-110 transition-all"><Swords size={22} /></Link>
+      </div>
 
       {/* User Posts */}
       <h2 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
