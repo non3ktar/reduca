@@ -9,6 +9,40 @@ export default function WidgetChat({ currentUser }) {
   const [error, setError] = useState(false);
   const chatRef = useRef(null);
 
+  const playNotificationSound = () => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const audioCtx = new AudioContext();
+      
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      osc1.connect(gainNode);
+      osc2.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      osc1.type = 'sine';
+      osc2.type = 'sine';
+
+      osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime); // E5
+      osc2.frequency.setValueAtTime(783.99, audioCtx.currentTime); // G5
+
+      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+      osc1.start(audioCtx.currentTime);
+      osc2.start(audioCtx.currentTime);
+      
+      osc1.stop(audioCtx.currentTime + 0.3);
+      osc2.stop(audioCtx.currentTime + 0.3);
+    } catch (error) {
+      console.log('Audio error:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchMsgs = async () => {
       try {
@@ -30,6 +64,10 @@ export default function WidgetChat({ currentUser }) {
       const channel = supabase.channel('global-chat')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
           setMessages(prev => [...prev, payload.new]);
+          // Toca som se a mensagem não for do próprio usuário
+          if (payload.new.user_id !== currentUser?.id) {
+            playNotificationSound();
+          }
         })
         .subscribe();
 
