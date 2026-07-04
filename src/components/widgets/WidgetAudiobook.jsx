@@ -9,23 +9,6 @@ export default function WidgetAudiobook({ currentUser, isAdmin }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editInput, setEditInput] = useState('');
 
-  const parseAudioInput = (input) => {
-    if (!input) return null;
-    
-    // Se o usuário colou todo o código <iframe> do Castbox ou outro site
-    const srcMatch = input.match(/src="([^"]+)"/);
-    if (srcMatch) {
-      return srcMatch[1]; // Retorna apenas o link
-    }
-    
-    // Se colou apenas o link direto
-    if (input.startsWith('http')) {
-      return input;
-    }
-    
-    return null;
-  };
-
   useEffect(() => {
     fetchFeaturedAudiobook();
 
@@ -58,9 +41,14 @@ export default function WidgetAudiobook({ currentUser, isAdmin }) {
 
       if (posts && posts.length > 0) {
         const content = posts[0].content;
-        const urlMatch = content.match(/#audiolivro\s+(.+)/);
-        if (urlMatch) {
-          setEmbedUrl(urlMatch[1].trim());
+        const tagIndex = content.indexOf('#audiolivro');
+        if (tagIndex !== -1) {
+          const payload = content.slice(tagIndex + '#audiolivro'.length).trim();
+          if (payload === 'empty' || payload === '') {
+            setEmbedUrl(null);
+          } else {
+            setEmbedUrl(payload);
+          }
         }
       }
     } catch (e) {
@@ -71,21 +59,15 @@ export default function WidgetAudiobook({ currentUser, isAdmin }) {
 
   const handleUpdateAudiobook = async (e) => {
     e.preventDefault();
-    if (!editInput) return;
-    
-    const parsedUrl = parseAudioInput(editInput);
-    if (!parsedUrl) {
-      alert("Entrada inválida. Cole o código <iframe...> ou o link direto.");
-      return;
-    }
+    let parsedContent = editInput.trim() === '' ? 'empty' : editInput.trim();
 
     try {
       await supabase.from('posts').insert({
         user_id: currentUser.id,
-        content: `#audiolivro ${parsedUrl}`
+        content: `#audiolivro ${parsedContent}`
       });
       
-      setEmbedUrl(parsedUrl);
+      setEmbedUrl(parsedContent === 'empty' ? null : parsedContent);
       setIsEditing(false);
       setEditInput('');
     } catch (e) {
@@ -130,13 +112,12 @@ export default function WidgetAudiobook({ currentUser, isAdmin }) {
               <h3 className="text-sm font-bold text-slate-200">Editar Conteúdo</h3>
             </div>
             <div className="flex flex-col gap-2">
-              <input 
-                type="text" 
-                placeholder="Cole o código <iframe...>..." 
+              <textarea 
+                rows="4"
+                placeholder="Cole o link ou código HTML... (Deixe vazio para apagar)" 
                 value={editInput} 
                 onChange={e => setEditInput(e.target.value)}
-                className="glass-input w-full border-slate-700 focus:border-orange-500 text-xs py-2 px-3"
-                required
+                className="glass-input w-full border-slate-700 focus:border-orange-500 text-xs py-2 px-3 resize-none"
               />
               <div className="flex gap-2">
                 <button type="submit" className="flex-1 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors flex items-center justify-center font-medium shadow-lg shadow-orange-500/20 text-xs">
@@ -160,15 +141,19 @@ export default function WidgetAudiobook({ currentUser, isAdmin }) {
                   <LayoutTemplate size={18} className="text-orange-500" />
                   Conteúdo em Destaque
                 </h3>
-                <div className="rounded-xl overflow-hidden shadow-lg border border-slate-700/50 bg-black/20 w-full relative">
-                  <iframe 
-                    className="w-full h-[500px]"
-                    src={embedUrl} 
-                    title="Audio player" 
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                    allowFullScreen>
-                  </iframe>
+                <div className="rounded-xl overflow-hidden shadow-lg border border-slate-700/50 bg-black/20 w-full relative flex items-center justify-center min-h-[100px]">
+                  {embedUrl.startsWith('http') ? (
+                    <iframe 
+                      className="w-full h-[500px]"
+                      src={embedUrl} 
+                      title="Audio player" 
+                      frameBorder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                      allowFullScreen>
+                    </iframe>
+                  ) : (
+                    <div className="w-full" dangerouslySetInnerHTML={{ __html: embedUrl }} />
+                  )}
                 </div>
               </>
             ) : (
