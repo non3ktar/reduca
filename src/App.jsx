@@ -104,6 +104,51 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!session?.user) return;
+
+    let presenceChannel;
+
+    const trackPresence = async () => {
+      // Busca os dados do perfil para exibir foto e nome no widget
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name, avatar, is_verified')
+        .eq('id', session.user.id)
+        .single();
+
+      if (!profile) return;
+
+      presenceChannel = supabase.channel('online-users', {
+        config: {
+          presence: {
+            key: session.user.id,
+          },
+        },
+      });
+
+      presenceChannel.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({
+            user_id: session.user.id,
+            name: profile.name,
+            avatar: profile.avatar,
+            is_verified: profile.is_verified,
+            online_at: new Date().toISOString(),
+          });
+        }
+      });
+    };
+
+    trackPresence();
+
+    return () => {
+      if (presenceChannel) {
+        supabase.removeChannel(presenceChannel);
+      }
+    };
+  }, [session]);
+
   if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-orange-500 font-bold">Carregando Reduca...</div>;
 
   const routerBasename = "";

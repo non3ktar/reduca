@@ -5,6 +5,7 @@ import Post from '../components/Post';
 import Sidebar from '../components/Sidebar';
 import ThemeToggle from '../components/ThemeToggle';
 import WidgetMembros from '../components/widgets/WidgetMembros';
+import WidgetOnline from '../components/widgets/WidgetOnline';
 import WidgetQuemSeguir from '../components/widgets/WidgetQuemSeguir';
 import WidgetAniversarios from '../components/widgets/WidgetAniversarios';
 import WidgetGrupos from '../components/widgets/WidgetGrupos';
@@ -157,6 +158,7 @@ export default function Home({ user }) {
         {/* Left Sidebar (Desktop & Mobile "pessoas" tab) */}
         <aside className={`lg:block space-y-4 pb-6 lg:h-fit lg:sticky lg:bottom-4 ${mobileTab === 'pessoas' ? 'block' : 'hidden'}`}>
           <WidgetAudiobook currentUser={userData} isAdmin={userData?.is_admin} />
+          <WidgetOnline />
           <WidgetMembros />
           <WidgetEscambo />
           <WidgetGrupos />
