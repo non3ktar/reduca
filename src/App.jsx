@@ -27,6 +27,7 @@ import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import GlobalMailNotifier from './components/GlobalMailNotifier';
+import { usePresenceStore } from './store/usePresenceStore';
 
 const PageTransition = ({ children }) => {
   return (
@@ -125,6 +126,19 @@ export default function App() {
             key: session.user.id,
           },
         },
+      });
+
+      presenceChannel.on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState();
+        const users = [];
+        
+        for (const id in state) {
+          if (state[id].length > 0) {
+            users.push(state[id][0]);
+          }
+        }
+        
+        usePresenceStore.getState().setOnlineUsers(users);
       });
 
       presenceChannel.subscribe(async (status) => {

@@ -1,37 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../../supabase';
+import React from 'react';
 import { Radio, BadgeCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { usePresenceStore } from '../../store/usePresenceStore';
 
 export default function WidgetOnline() {
-  const [onlineUsers, setOnlineUsers] = useState([]);
-
-  useEffect(() => {
-    const channel = supabase.channel('online-users');
-
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const users = [];
-        
-        // Supabase presenceState returns an object with arrays of presences per key
-        for (const id in state) {
-          // Cada id tem um array de conexões (se a pessoa abrir em duas abas, terão duas presenças aqui)
-          // Pegamos a primeira presença para exibir os dados
-          if (state[id].length > 0) {
-            users.push(state[id][0]);
-          }
-        }
-        
-        setOnlineUsers(users);
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  const onlineUsers = usePresenceStore(state => state.onlineUsers);
 
   return (
     <motion.div 
