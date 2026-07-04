@@ -8,36 +8,42 @@ export default function WidgetChat({ currentUser }) {
   const [newMsg, setNewMsg] = useState('');
   const [error, setError] = useState(false);
   const chatRef = useRef(null);
+  const audioCtxRef = useRef(null);
 
   const playNotificationSound = () => {
     try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      const audioCtx = new AudioContext();
+      if (!audioCtxRef.current) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        audioCtxRef.current = new AudioContext();
+      }
+      
+      const audioCtx = audioCtxRef.current;
+      
+      // Navegadores bloqueiam som até que o usuário clique na página
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
       
       const osc1 = audioCtx.createOscillator();
-      const osc2 = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
       osc1.connect(gainNode);
-      osc2.connect(gainNode);
       gainNode.connect(audioCtx.destination);
 
       osc1.type = 'sine';
-      osc2.type = 'sine';
+      
+      // Um pop sonoro curto e agradável, mais perceptível
+      osc1.frequency.setValueAtTime(800, audioCtx.currentTime); 
+      osc1.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
 
-      osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime); // E5
-      osc2.frequency.setValueAtTime(783.99, audioCtx.currentTime); // G5
-
+      // Aumentei o volume de 0.1 para 0.5
       gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.05);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
 
       osc1.start(audioCtx.currentTime);
-      osc2.start(audioCtx.currentTime);
-      
-      osc1.stop(audioCtx.currentTime + 0.3);
-      osc2.stop(audioCtx.currentTime + 0.3);
+      osc1.stop(audioCtx.currentTime + 0.15);
     } catch (error) {
       console.log('Audio error:', error);
     }
