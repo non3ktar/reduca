@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
-import { BookOpen, FileText, Send, X, Clock, User, Trash2, ArrowLeft, Share2, Heart, Sparkles, Loader2 } from 'lucide-react';
+import { BookOpen, FileText, Send, X, Clock, User, Trash2, ArrowLeft, Share2, Heart, Sparkles, Loader2, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import CoverPicker from '../components/CoverPicker';
@@ -11,6 +11,8 @@ export default function Blog({ user }) {
   const [isComposing, setIsComposing] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [isTelegraph, setIsTelegraph] = useState(false);
+  const [telegraphUrl, setTelegraphUrl] = useState('');
   const [coverImage, setCoverImage] = useState('');
   const [readingArticle, setReadingArticle] = useState(null);
   const [favorites, setFavorites] = useState([]);
@@ -44,17 +46,26 @@ export default function Blog({ user }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
+    if (!title.trim()) return;
+    if (!isTelegraph && !content.trim()) return;
+    if (isTelegraph && (!telegraphUrl.trim() || !telegraphUrl.includes('telegra.ph'))) {
+      alert("Por favor, insira um link válido do Telegra.ph");
+      return;
+    }
+
+    const finalContent = isTelegraph ? telegraphUrl.trim() : content;
 
     await supabase.from('articles').insert({
       author_id: user.id,
       title,
-      content,
+      content: finalContent,
       cover_image: coverImage
     });
 
     setTitle('');
     setContent('');
+    setTelegraphUrl('');
+    setIsTelegraph(false);
     setCoverImage('');
     setIsComposing(false);
     fetchArticles(); // refresh
@@ -174,19 +185,73 @@ export default function Blog({ user }) {
                   />
                 </div>
                 
-                <textarea
-                  placeholder="Escreva seu texto longo aqui..."
-                  value={content}
-                  onChange={e => setContent(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-base text-slate-200 focus:outline-none focus:border-orange-500 transition min-h-[300px] resize-y"
-                  required
-                />
+                <div className="flex items-center gap-4 mb-2">
+                  <button type="button" onClick={() => setIsTelegraph(false)} className={`px-4 py-2 rounded-lg font-medium transition flex-1 sm:flex-none ${!isTelegraph ? 'bg-orange-600 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'}`}>Texto Longo (Local)</button>
+                  <button type="button" onClick={() => setIsTelegraph(true)} className={`px-4 py-2 rounded-lg font-medium transition flex items-center justify-center gap-2 flex-1 sm:flex-none ${isTelegraph ? 'bg-[#3390ec] text-white shadow-lg shadow-[#3390ec]/20' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-300'}`}><ExternalLink size={16}/> Telegra.ph</button>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {isTelegraph ? (
+                    <motion.div 
+                      key="telegraph"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="bg-[#3390ec]/10 border border-[#3390ec]/30 rounded-xl p-5"
+                    >
+                      <div className="flex flex-col sm:flex-row items-start gap-4 mb-5">
+                        <div className="bg-[#3390ec]/20 p-3 rounded-xl shrink-0">
+                          <ExternalLink className="text-[#3390ec]" size={28} />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-[#3390ec] text-lg mb-2">Como publicar externamente:</h4>
+                          <ol className="text-slate-300 text-sm leading-relaxed space-y-2 list-decimal list-inside mb-4">
+                            <li>Clique no botão abaixo para abrir o editor do Telegra.ph (nova aba).</li>
+                            <li>Escreva seu artigo lá com imagens e formatação rica, e clique em <strong>Publish</strong>.</li>
+                            <li>Copie o link gerado (URL) lá no topo do navegador.</li>
+                            <li>Volte aqui e cole o link no campo abaixo.</li>
+                          </ol>
+                          <a 
+                            href="https://telegra.ph/" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-[#3390ec] hover:bg-[#2879c7] text-white px-5 py-2.5 rounded-lg font-medium transition shadow-lg shadow-[#3390ec]/20"
+                          >
+                            Abrir Telegra.ph para Escrever <ExternalLink size={16} />
+                          </a>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="url"
+                          placeholder="Cole aqui o link final (ex: https://telegra.ph/Meu-Artigo-01-01)"
+                          value={telegraphUrl}
+                          onChange={e => setTelegraphUrl(e.target.value)}
+                          className="w-full bg-slate-900 border border-[#3390ec]/50 rounded-xl px-4 py-4 pl-4 text-base text-slate-200 focus:outline-none focus:border-[#3390ec] focus:ring-2 focus:ring-[#3390ec]/30 transition"
+                          required={isTelegraph}
+                        />
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.textarea
+                      key="local"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      placeholder="Escreva seu texto longo aqui..."
+                      value={content}
+                      onChange={e => setContent(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-base text-slate-200 focus:outline-none focus:border-orange-500 transition min-h-[300px] resize-y"
+                      required={!isTelegraph}
+                    />
+                  )}
+                </AnimatePresence>
 
                 <div className="flex justify-end pt-4">
                   <button
                     type="submit"
-                    disabled={!title.trim() || !content.trim()}
-                    className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-medium transition flex items-center gap-2 shadow-lg shadow-orange-500/20"
+                    disabled={!title.trim() || (!isTelegraph && !content.trim()) || (isTelegraph && !telegraphUrl.trim())}
+                    className={`text-white px-8 py-3 rounded-xl font-medium transition flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${isTelegraph ? 'bg-[#3390ec] hover:bg-[#2879c7] shadow-[#3390ec]/20' : 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/20'}`}
                   >
                     <span>Publicar Artigo</span>
                     <Send size={18} />
@@ -285,9 +350,33 @@ export default function Blog({ user }) {
                 )}
               </div>
 
-              <div className="prose prose-invert prose-orange max-w-none text-lg text-slate-300 leading-relaxed whitespace-pre-wrap mb-12">
-                {readingArticle.content}
-              </div>
+              {readingArticle.content?.includes('telegra.ph') ? (
+                <div className="flex flex-col items-center justify-center py-12 bg-slate-900/50 rounded-2xl border border-slate-700/50 mb-12 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
+                    <ExternalLink size={120} />
+                  </div>
+                  <div className="bg-[#3390ec]/10 p-4 rounded-full mb-4 ring-4 ring-[#3390ec]/5">
+                    <ExternalLink size={40} className="text-[#3390ec]" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-3 text-center">Ler no Telegra.ph</h3>
+                  <p className="text-slate-400 mb-8 text-center max-w-md px-4 leading-relaxed">
+                    Este artigo utiliza formatação rica e foi publicado externamente no Telegra.ph pelo autor.
+                  </p>
+                  <a 
+                    href={readingArticle.content} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="bg-[#3390ec] hover:bg-[#2879c7] text-white px-8 py-3.5 rounded-xl font-bold transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-[#3390ec]/20 flex items-center gap-3 relative z-10"
+                  >
+                    Abrir Artigo Completo
+                    <ArrowLeft className="rotate-135" size={18} />
+                  </a>
+                </div>
+              ) : (
+                <div className="prose prose-invert prose-orange max-w-none text-lg text-slate-300 leading-relaxed whitespace-pre-wrap mb-12">
+                  {readingArticle.content}
+                </div>
+              )}
 
               {/* Rodapé de Ações do Artigo */}
               <div className="mt-8 pt-6 border-t border-slate-700/50 flex flex-wrap items-center justify-between gap-4">
@@ -341,7 +430,11 @@ export default function Blog({ user }) {
                     )}
                   </h2>
                   <p className="text-slate-400 mb-6 line-clamp-3 flex-1">
-                    {article.content}
+                    {article.content?.includes('telegra.ph') ? (
+                      <span className="flex items-center gap-1 text-[#3390ec] font-medium"><ExternalLink size={14} /> Artigo Completo no Telegra.ph</span>
+                    ) : (
+                      article.content
+                    )}
                   </p>
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/50">
                     <div className="flex items-center gap-2">
