@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Marketplace from './pages/Marketplace';
@@ -46,6 +46,17 @@ const PageTransition = ({ children }) => {
 
 function AnimatedRoutes({ session }) {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('r');
+    if (redirect) {
+      // Remove query param from URL without reloading
+      window.history.replaceState({}, document.title, redirect);
+      navigate(redirect, { replace: true });
+    }
+  }, [navigate]);
   
   return (
     <AnimatePresence mode="wait">

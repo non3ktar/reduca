@@ -3,6 +3,7 @@ import { supabase } from '../supabase';
 import { Heart, MessageCircle, Share2, MoreHorizontal, Send, BarChart2, SmilePlus, BadgeCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import ShareButton from './ShareButton';
 
 const COMMON_EMOJIS = ['👍','😂','❤️','😍','😊','🔥','💡','🚀','🙌','🤔','👏','🎉','💯','👀','📚','✏️'];
 
@@ -60,23 +61,6 @@ export default function Post({ post, currentUser }) {
     setNewComment('');
   };
 
-  const handleShare = async () => {
-    try {
-      const shareUrl = `https://reduca.zonaeducacional.org/profile/${author.id}`;
-      if (navigator.share) {
-        await navigator.share({
-          title: `Post de ${author.name}`,
-          text: post.content,
-          url: shareUrl,
-        });
-      } else {
-        await navigator.clipboard.writeText(shareUrl);
-        alert('Link copiado para a área de transferência!');
-      }
-    } catch (err) {
-      console.log('Error sharing', err);
-    }
-  };
 
   return (
     <motion.div 
@@ -213,9 +197,12 @@ export default function Post({ post, currentUser }) {
           <span className="text-sm">{comments.length > 0 ? comments.length : 'Comentar'}</span>
         </button>
         
-        <button onClick={handleShare} className="flex items-center gap-2 text-slate-400 hover:text-green-400 transition ml-auto">
-          <Share2 size={20} />
-        </button>
+        <ShareButton 
+          url={`https://reduca.zonaeducacional.org/profile/${author.id}`}
+          title={`Post de ${author.name}`}
+          text={post.content ? post.content.substring(0, 100) : ''}
+          className="ml-auto !p-0 !bg-transparent hover:!bg-transparent text-slate-400 hover:text-green-400"
+        />
       </div>
 
       {/* Comments Section */}
