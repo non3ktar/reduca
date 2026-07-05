@@ -95,7 +95,7 @@ export default function ShareButton({ url, title, text, className = '' }) {
               className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6 overflow-hidden border border-slate-200/50 dark:border-slate-700/50"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">
                   Compartilhar
                 </h3>
                 <button 
@@ -116,7 +116,7 @@ export default function ShareButton({ url, title, text, className = '' }) {
                   <div className="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 group-hover:scale-110 group-hover:bg-green-500 group-hover:text-white transition-all duration-300 shadow-sm">
                     <MessageCircle size={24} />
                   </div>
-                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">WhatsApp</span>
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-400 mt-1">WhatsApp</span>
                 </a>
                 
                 <a 
@@ -128,7 +128,7 @@ export default function ShareButton({ url, title, text, className = '' }) {
                   <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
                     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
                   </div>
-                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Facebook</span>
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-400 mt-1">Facebook</span>
                 </a>
                 
                 <a 
@@ -140,7 +140,7 @@ export default function ShareButton({ url, title, text, className = '' }) {
                   <div className="w-14 h-14 rounded-full bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center text-sky-500 dark:text-sky-400 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all duration-300 shadow-sm">
                     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
                   </div>
-                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">X</span>
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-400 mt-1">X</span>
                 </a>
                 
                 <a 
@@ -152,13 +152,13 @@ export default function ShareButton({ url, title, text, className = '' }) {
                   <div className="w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
                     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
                   </div>
-                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">LinkedIn</span>
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-400 mt-1">LinkedIn</span>
                 </a>
               </div>
 
               <div className="relative">
                 <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
-                  <div className="flex-1 truncate text-sm text-slate-500 dark:text-slate-400 select-all" title={fullUrl}>
+                  <div className="flex-1 truncate text-sm text-slate-700 dark:text-slate-300 font-medium select-all" title={fullUrl}>
                     {fullUrl}
                   </div>
                   <button
