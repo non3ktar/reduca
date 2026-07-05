@@ -15,6 +15,8 @@ import WidgetEscambo from '../components/widgets/WidgetEscambo';
 import WidgetVideoDestaque from '../components/widgets/WidgetVideoDestaque';
 import WidgetAudiobook from '../components/widgets/WidgetAudiobook';
 import WidgetOnlyOffice from '../components/widgets/WidgetOnlyOffice';
+import WidgetKolibri from '../components/widgets/WidgetKolibri';
+import WidgetKialo from '../components/widgets/WidgetKialo';
 import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays, RefreshCcw, Mail, Gamepad2, Swords, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppDrawer from '../components/AppDrawer';
@@ -159,6 +161,8 @@ export default function Home({ user }) {
         {/* Left Sidebar (Desktop & Mobile "pessoas" tab) */}
         <aside className={`lg:block space-y-4 pb-6 lg:h-fit lg:sticky lg:bottom-4 ${mobileTab === 'pessoas' ? 'block' : 'hidden'}`}>
           <WidgetOnlyOffice />
+          <WidgetKolibri />
+          <WidgetKialo />
           <WidgetAudiobook currentUser={userData} isAdmin={userData?.is_admin} />
           <WidgetOnline />
           <WidgetMembros />
