@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { ArrowLeft, Edit3, MapPin, Briefcase, Calendar, X, BadgeCheck, Trophy, MessageSquare, Heart, Mail, Home, BookOpen, MessageCircle, RefreshCcw, Users, Gamepad2, Swords, GraduationCap } from 'lucide-react';
+import { ArrowLeft, Edit3, MapPin, Briefcase, Calendar, X, BadgeCheck, Trophy, MessageSquare, Heart, Mail, Home, BookOpen, MessageCircle, RefreshCcw, Users, Gamepad2, Swords, GraduationCap, Gavel } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../components/ThemeToggle';
 import Post from '../components/Post';
@@ -197,6 +197,7 @@ export default function Profile({ currentUser }) {
                 <Link to="/jogoforca" title="Forca" className="text-slate-400 hover:text-orange-500 hover:scale-110 transition-all"><Gamepad2 size={18} /></Link>
                 <Link to="/males" title="Malês" className="text-slate-400 hover:text-orange-500 hover:scale-110 transition-all"><Swords size={18} /></Link>
                 <Link to="/turmas" title="Turmas" className="text-slate-400 hover:text-orange-500 hover:scale-110 transition-all"><GraduationCap size={18} /></Link>
+                <Link to="/debates" title="Debates" className="text-slate-400 hover:text-orange-500 hover:scale-110 transition-all"><Gavel size={18} /></Link>
               </div>
             </div>
           </div>

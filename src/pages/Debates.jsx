@@ -5,6 +5,7 @@ import { MessageSquare, Plus, ArrowLeft, Send, ChevronRight, ChevronLeft, GitMer
 import { Link } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import ThemeToggle from '../components/ThemeToggle';
 
 function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -193,6 +194,7 @@ export default function Debates({ user }) {
             >
               <Info size={18} />
             </button>
+            <ThemeToggle />
           </div>
         </div>
 
