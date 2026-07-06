@@ -19,8 +19,7 @@ import JogoForca from './pages/JogoForca';
 import VisualNovelMales from './pages/VisualNovelMales';
 import Turmas from './pages/Turmas';
 import SalaOnlyOffice from './pages/SalaOnlyOffice';
-import KolibriView from './pages/KolibriView';
-import KialoDebates from './pages/KialoDebates';
+import Debates from './pages/Debates';
 import ScrollToTop from './components/ScrollToTop';
 import AutoUpdater from './components/AutoUpdater';
 import OnboardingModal from './components/OnboardingModal';
@@ -83,8 +82,7 @@ function AnimatedRoutes({ session }) {
           <Route path="/males" element={<PageTransition>{session ? <VisualNovelMales /> : <Navigate to="/login" />}</PageTransition>} />
           <Route path="/turmas" element={<PageTransition>{session ? <Turmas user={session.user} /> : <Navigate to="/login" />}</PageTransition>} />
           <Route path="/office" element={<PageTransition>{session ? <SalaOnlyOffice /> : <Navigate to="/login" />}</PageTransition>} />
-          <Route path="/aprender" element={<PageTransition>{session ? <KolibriView user={session.user} /> : <Navigate to="/login" />}</PageTransition>} />
-          <Route path="/debates" element={<PageTransition>{session ? <KialoDebates user={session.user} /> : <Navigate to="/login" />}</PageTransition>} />
+          <Route path="/debates" element={<PageTransition>{session ? <Debates user={session.user} /> : <Navigate to="/login" />}</PageTransition>} />
           <Route path="/profile" element={<PageTransition>{session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />}</PageTransition>} />
           <Route path="/profile/:id" element={<PageTransition>{session ? <Profile currentUser={session.user} /> : <Navigate to="/login" />}</PageTransition>} />
       </Routes>

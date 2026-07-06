@@ -15,9 +15,7 @@ import WidgetEscambo from '../components/widgets/WidgetEscambo';
 import WidgetVideoDestaque from '../components/widgets/WidgetVideoDestaque';
 import WidgetAudiobook from '../components/widgets/WidgetAudiobook';
 import WidgetOnlyOffice from '../components/widgets/WidgetOnlyOffice';
-import WidgetKolibri from '../components/widgets/WidgetKolibri';
-import WidgetKialo from '../components/widgets/WidgetKialo';
-import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays, RefreshCcw, Mail, Gamepad2, Swords, GraduationCap } from 'lucide-react';
+import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays, RefreshCcw, Mail, Gamepad2, Swords, GraduationCap, Gavel } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppDrawer from '../components/AppDrawer';
 import { App } from '@capacitor/app';
@@ -131,6 +129,7 @@ export default function Home({ user }) {
             <Link to="/jogoforca" className={`transition-colors ${window.location.pathname.startsWith('/jogoforca') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Palavra Secreta"><Gamepad2 size={24} /></Link>
             <Link to="/males" className={`transition-colors ${window.location.pathname.startsWith('/males') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Malês - VN"><Swords size={24} /></Link>
             <Link to="/turmas" className={`transition-colors ${window.location.pathname.startsWith('/turmas') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Turmas"><GraduationCap size={24} /></Link>
+            <Link to="/debates" className={`transition-colors ${window.location.pathname.startsWith('/debates') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Debates"><Gavel size={24} /></Link>
             
             <div className="relative">
               <button onClick={() => {setShowNotif(!showNotif); setShowMsg(false)}} className="text-slate-300 hover:text-white transition-colors"><Bell size={24} /></button>
@@ -161,8 +160,6 @@ export default function Home({ user }) {
         {/* Left Sidebar (Desktop & Mobile "pessoas" tab) */}
         <aside className={`lg:block space-y-4 pb-6 lg:h-fit lg:sticky lg:bottom-4 ${mobileTab === 'pessoas' ? 'block' : 'hidden'}`}>
           <WidgetOnlyOffice />
-          <WidgetKolibri />
-          <WidgetKialo />
           <WidgetAudiobook currentUser={userData} isAdmin={userData?.is_admin} />
           <WidgetOnline />
           <WidgetMembros />
@@ -201,6 +198,9 @@ export default function Home({ user }) {
                </Link>
                <Link to="/males" className="text-orange-500 p-1.5 glass rounded-full" title="Malês: A História Esquecida">
                  <Swords size={18} />
+               </Link>
+               <Link to="/debates" className="text-orange-500 p-1.5 glass rounded-full" title="Debates">
+                 <Gavel size={18} />
                </Link>
                <div className="px-0.5"><AppDrawer /></div>
                <ThemeToggle />
