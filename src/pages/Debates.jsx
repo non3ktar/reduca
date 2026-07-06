@@ -137,6 +137,24 @@ export default function Debates({ user }) {
       setNewArgContent('');
       setIsAddingArg(null);
       fetchArguments(activeDebate.id);
+
+      try {
+        let targetUserId = activeDebate.author_id;
+        if (nodeFocus) {
+          const { data: parentArg } = await supabase.from('arguments').select('author_id').eq('id', nodeFocus).single();
+          if (parentArg) targetUserId = parentArg.author_id;
+        }
+        
+        if (targetUserId && targetUserId !== user.id) {
+          await supabase.from('notifications').insert({
+            user_id: targetUserId,
+            actor_id: user.id,
+            type: 'debate',
+            message: `adicionou um argumento ${isAddingArg === 'pro' ? 'Pró' : 'Contra'} no debate.`,
+            link: '/debates'
+          });
+        }
+      } catch(e) { console.error(e) }
     }
   };
 

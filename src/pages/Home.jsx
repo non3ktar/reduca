@@ -28,6 +28,9 @@ export default function Home({ user }) {
   const [showNotif, setShowNotif] = useState(false);
   const [mobileTab, setMobileTab] = useState('feed');
   const [posts, setPosts] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+
+  const unreadCount = notifications.filter(n => !n.is_read).length;
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -58,6 +61,18 @@ export default function Home({ user }) {
     
     fetchPosts();
 
+    const fetchNotifications = async () => {
+      const { data } = await supabase
+        .from('notifications')
+        .select('*, actor:profiles!actor_id(name, avatar)')
+        .eq('user_id', user.id)
+        .eq('is_read', false)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (data) setNotifications(data);
+    };
+    fetchNotifications();
+
     const channel = supabase.channel('realtime-posts')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, async payload => {
         if (payload.eventType === 'INSERT') {
@@ -76,8 +91,43 @@ export default function Home({ user }) {
       })
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
+    const channelNotif = supabase.channel('realtime-notifications')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, async payload => {
+        const { data: newNotif } = await supabase
+          .from('notifications')
+          .select('*, actor:profiles!actor_id(name, avatar)')
+          .eq('id', payload.new.id)
+          .single();
+        if (newNotif && !newNotif.is_read) {
+          setNotifications(current => [newNotif, ...current]);
+        }
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, payload => {
+        if (payload.new.is_read) {
+          setNotifications(current => current.filter(n => n.id !== payload.new.id));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+      supabase.removeChannel(channelNotif);
+    };
   }, [user]);
+
+  const handleNotificationClick = async (notif) => {
+    // Mark as read in DB
+    await supabase.from('notifications').update({ is_read: true }).eq('id', notif.id);
+    
+    // Remove from local state
+    setNotifications(current => current.filter(n => n.id !== notif.id));
+    setShowNotif(false);
+
+    // Redirect
+    if (notif.link) {
+      window.location.href = notif.link; // Usando window.location para forçar reload e garantir navegação
+    }
+  };
 
   const handleManualUpdateCheck = async () => {
     if (!Capacitor.isNativePlatform()) {
@@ -132,8 +182,40 @@ export default function Home({ user }) {
             <Link to="/debates" className={`transition-colors ${window.location.pathname.startsWith('/debates') ? 'text-orange-500' : 'text-slate-300 hover:text-orange-400'}`} title="Debates"><Gavel size={24} /></Link>
             
             <div className="relative">
-              <button onClick={() => {setShowNotif(!showNotif); setShowMsg(false)}} className="text-slate-300 hover:text-white transition-colors"><Bell size={24} /></button>
-              {showNotif && <div className="absolute top-10 right-0 w-48 p-3 glass-card text-sm text-slate-300 text-center z-50">Sem notificações no momento</div>}
+              <button onClick={() => {setShowNotif(!showNotif); setShowMsg(false)}} className="text-slate-300 hover:text-white transition-colors relative">
+                <Bell size={24} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              {showNotif && (
+                <div className="absolute top-10 right-0 w-72 max-h-96 overflow-y-auto p-2 glass-card z-50 shadow-2xl border border-slate-700">
+                  <h3 className="text-sm font-bold text-slate-300 px-3 py-2 border-b border-slate-700/50 mb-2">Notificações</h3>
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-sm text-slate-400 text-center">Nenhuma notificação nova</div>
+                  ) : (
+                    notifications.map(n => (
+                      <div 
+                        key={n.id} 
+                        onClick={() => handleNotificationClick(n)}
+                        className="flex items-start gap-3 p-2 hover:bg-slate-800/50 rounded-lg cursor-pointer transition-colors mb-1"
+                      >
+                        {n.actor && <img src={n.actor.avatar} alt="Avatar" className="w-8 h-8 rounded-full object-cover shrink-0" />}
+                        <div>
+                          <p className="text-xs text-slate-200">
+                            {n.actor && <span className="font-bold">{n.actor.name}</span>} {n.message}
+                          </p>
+                          <p className="text-[10px] text-orange-400 mt-1">
+                            {new Date(n.created_at).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3 ml-4 pl-4 border-l border-slate-700">
@@ -248,7 +330,14 @@ export default function Home({ user }) {
           </button>
           
           <button onClick={() => {setShowNotif(!showNotif); setShowMsg(false)}} className="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-slate-300 relative transition-colors">
-            <Bell size={22} />
+            <div className="relative">
+              <Bell size={22} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
             <span className="text-[10px] mt-1 font-medium">Notific.</span>
           </button>
           
@@ -259,7 +348,32 @@ export default function Home({ user }) {
             </button>
           )}
 
-          {showNotif && <div className="absolute bottom-16 right-4 w-48 p-3 glass-card text-sm text-slate-300 text-center shadow-xl">Sem notificações no momento</div>}
+          {showNotif && (
+            <div className="absolute bottom-16 right-2 w-72 max-h-80 overflow-y-auto p-2 glass-card z-50 shadow-2xl border border-slate-700">
+              <h3 className="text-sm font-bold text-slate-300 px-3 py-2 border-b border-slate-700/50 mb-2">Notificações</h3>
+              {notifications.length === 0 ? (
+                <div className="p-4 text-sm text-slate-400 text-center">Nenhuma notificação nova</div>
+              ) : (
+                notifications.map(n => (
+                  <div 
+                    key={n.id} 
+                    onClick={() => handleNotificationClick(n)}
+                    className="flex items-start gap-3 p-2 hover:bg-slate-800/50 rounded-lg cursor-pointer transition-colors mb-1 text-left"
+                  >
+                    {n.actor && <img src={n.actor.avatar} alt="Avatar" className="w-8 h-8 rounded-full object-cover shrink-0" />}
+                    <div>
+                      <p className="text-xs text-slate-200">
+                        {n.actor && <span className="font-bold">{n.actor.name}</span>} {n.message}
+                      </p>
+                      <p className="text-[10px] text-orange-400 mt-1">
+                        {new Date(n.created_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </nav>
     </div>

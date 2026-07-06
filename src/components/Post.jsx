@@ -33,12 +33,24 @@ export default function Post({ post, currentUser }) {
   const handleLike = async () => {
     if (!currentUser) return;
     let newLikes = [...likes];
+    const isLiking = !isLiked;
+    
     if (isLiked) {
       newLikes = newLikes.filter(id => id !== currentUser.id);
     } else {
       newLikes.push(currentUser.id);
     }
     await supabase.from('posts').update({ likes: newLikes }).eq('id', post.id);
+
+    if (isLiking && currentUser.id !== post.user_id) {
+      await supabase.from('notifications').insert({
+        user_id: post.user_id,
+        actor_id: currentUser.id,
+        type: 'like',
+        message: 'curtiu sua publicação.',
+        link: '/'
+      });
+    }
   };
 
   const handleComment = async (e) => {
@@ -59,6 +71,16 @@ export default function Post({ post, currentUser }) {
     const newComments = [...comments, commentObj];
     await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
     setNewComment('');
+
+    if (currentUser.id !== post.user_id) {
+      await supabase.from('notifications').insert({
+        user_id: post.user_id,
+        actor_id: currentUser.id,
+        type: 'comment',
+        message: 'comentou na sua publicação.',
+        link: '/'
+      });
+    }
   };
 
 

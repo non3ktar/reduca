@@ -38,6 +38,16 @@ export default function ForumTopic({ user }) {
     if (data) {
       setReplies([...replies, data]);
       setNewReply('');
+
+      if (topic.author_id !== user.id) {
+        await supabase.from('notifications').insert({
+          user_id: topic.author_id,
+          actor_id: user.id,
+          type: 'forum',
+          message: 'respondeu ao seu tópico no fórum.',
+          link: `/forum/${id}`
+        });
+      }
     }
   };
 

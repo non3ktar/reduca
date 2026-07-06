@@ -70,6 +70,16 @@ export default function GroupDetail({ user }) {
       await supabase.from('group_members').insert([{ group_id: id, user_id: user.id }]);
       setIsMember(true);
       setMemberCount(prev => prev + 1);
+
+      if (group.created_by !== user.id) {
+        await supabase.from('notifications').insert({
+          user_id: group.created_by,
+          actor_id: user.id,
+          type: 'group',
+          message: `entrou no seu grupo "${group.name}".`,
+          link: `/groups/${id}`
+        });
+      }
     }
   };
 

@@ -70,6 +70,14 @@ export default function Profile({ currentUser }) {
 
     if (newStatus) {
       await supabase.from('follows').insert({ follower_id: currentUser.id, following_id: targetId });
+      
+      await supabase.from('notifications').insert({
+        user_id: targetId,
+        actor_id: currentUser.id,
+        type: 'follow',
+        message: 'começou a seguir você.',
+        link: `/profile/${currentUser.id}`
+      });
     } else {
       await supabase.from('follows')
         .delete()
