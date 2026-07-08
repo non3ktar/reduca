@@ -20,6 +20,7 @@ import VisualNovelMales from './pages/VisualNovelMales';
 import Turmas from './pages/Turmas';
 import SalaOnlyOffice from './pages/SalaOnlyOffice';
 import Debates from './pages/Debates';
+import Pricing from './pages/Pricing';
 import ScrollToTop from './components/ScrollToTop';
 import AutoUpdater from './components/AutoUpdater';
 import OnboardingModal from './components/OnboardingModal';
@@ -65,6 +66,7 @@ function AnimatedRoutes({ session }) {
           <Route path="/login" element={<PageTransition>{!session ? <Login /> : <Navigate to="/" />}</PageTransition>} />
           <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
           <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
+          <Route path="/planos" element={<PageTransition><Pricing /></PageTransition>} />
           
           {/* Protected Routes */}
           <Route path="/" element={<PageTransition>{session ? <Home user={session.user} /> : <Navigate to="/login" />}</PageTransition>} />
