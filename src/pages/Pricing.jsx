@@ -8,44 +8,40 @@ export default function Pricing() {
   const plans = [
     {
       name: "STARTER",
-      desc: "A melhor opção para testar a funcionalidade da plataforma e entender o básico.",
+      desc: "A melhor opção para professores testarem a plataforma.",
       monthlyPrice: 29.90,
       annualPrice: 24.90,
       members: "Até 100",
-      storage: "2 GB",
       features: [true, true, false, false, false, false, false],
       popular: false,
       buttonColor: "bg-slate-700 hover:bg-slate-600"
     },
     {
       name: "ESSENCIAL",
-      desc: "A maneira mais simples de configurar uma rede social para sua sala de aula.",
+      desc: "A maneira mais simples de configurar uma rede para sua escola.",
       monthlyPrice: 89.90,
       annualPrice: 71.90,
       members: "Até 500",
-      storage: "10 GB",
       features: [true, true, true, false, false, false, false],
       popular: false,
       buttonColor: "bg-slate-700 hover:bg-slate-600"
     },
     {
       name: "PERFORMANCE",
-      desc: "Ferramentas que você precisa para personalizar sua rede com flexibilidade.",
+      desc: "Domínio próprio, monetização e IA para sua instituição.",
       monthlyPrice: 199.90,
       annualPrice: 159.90,
       members: "Até 2.000",
-      storage: "50 GB",
       features: [true, true, true, true, true, false, false],
       popular: true,
       buttonColor: "bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 border-none text-white"
     },
     {
       name: "ULTIMATE",
-      desc: "Solução ideal com complementos premium, monetização e aplicativos nativos.",
+      desc: "Acesso total, membros ilimitados e aplicativo com a sua marca.",
       monthlyPrice: 399.90,
       annualPrice: 319.90,
-      members: "Até 10.000",
-      storage: "100 GB+",
+      members: "Ilimitados",
       features: [true, true, true, true, true, true, true],
       popular: false,
       buttonColor: "bg-slate-700 hover:bg-slate-600"
@@ -55,10 +51,10 @@ export default function Pricing() {
   const featureList = [
     "Subdomínio *.zonaeducacional.org",
     "Widgets Básicos (Feed, Calendário)",
-    "Construtor de Arrastar & Soltar",
+    "Acesso ao Marketplace de Widgets",
     "Domínio Próprio (www.escola.com)",
     "Widgets Premium (Audiobook, E-commerce)",
-    "Ferramentas de Analytics e SEO",
+    "Ferramentas Nativas de IA",
     "Geração de App Nativo (APK e Desktop)"
   ];
 
@@ -92,7 +88,7 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto px-4 pt-20 pb-16 text-center">
         <h1 className="text-4xl md:text-5xl font-black text-white mb-6">Crie sua própria rede social educacional.</h1>
         <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-10">
-          Você está quase terminando! Comece com <span className="text-orange-500 font-bold">14 dias totalmente gratuitos</span> em qualquer plano. Sem compromisso.
+          Você está quase terminando! Comece com <span className="text-orange-500 font-bold">14 dias totalmente gratuitos</span> em qualquer plano. Armazenamento em nuvem 100% livre.
         </p>
 
         {/* Toggle Mensal/Anual */}
@@ -148,10 +144,6 @@ export default function Pricing() {
           <div className="grid grid-cols-5 border-b border-slate-800/50">
              <div className="p-4 flex items-center text-sm font-bold text-slate-300">Membros</div>
              {plans.map((plan, i) => <div key={i} className={`p-4 text-center text-sm text-slate-400 border-l border-slate-800/50 ${plan.popular ? 'bg-slate-800/20' : ''}`}>{plan.members}</div>)}
-          </div>
-          <div className="grid grid-cols-5 border-b border-slate-800/50 bg-slate-900/20">
-             <div className="p-4 flex items-center text-sm font-bold text-slate-300">Armazenamento</div>
-             {plans.map((plan, i) => <div key={i} className={`p-4 text-center text-sm text-slate-400 border-l border-slate-800/50 ${plan.popular ? 'bg-slate-800/20' : ''}`}>{plan.storage}</div>)}
           </div>
 
           {/* Seção Features */}
