@@ -23,7 +23,7 @@ export default function Pricing() {
 
   const features = [
     "Acesso completo ao Marketplace de Widgets",
-    "Armazenamento ilimitado em Nuvem",
+    "Postagens e Integrações Ilimitadas (YouTube, Drive)",
     "Domínio Personalizado (*.zonaeducacional.org ou próprio)",
     "Construtor de Arrastar e Soltar",
     "Sem anúncios ou rastreamento de dados",
