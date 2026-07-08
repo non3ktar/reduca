@@ -201,7 +201,7 @@ export default function WidgetEnquetes({ isAdmin }) {
                     </div>
                   ))}
                 </div>
-                {editOptions.length < 5 && (
+                {editOptions.length < 10 && (
                   <button onClick={addEditOption} className="mt-2 text-xs text-orange-400 hover:text-orange-300 flex items-center gap-1 font-medium">
                     <Plus size={12} /> Adicionar Opção
                   </button>

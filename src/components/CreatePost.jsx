@@ -66,7 +66,7 @@ export default function CreatePost({ user, groupId = null }) {
   };
 
   const addPollOption = () => {
-    if (pollOptions.length < 5) {
+    if (pollOptions.length < 10) {
       setPollOptions([...pollOptions, '']);
     }
   };
@@ -225,7 +225,7 @@ export default function CreatePost({ user, groupId = null }) {
                   </div>
                 ))}
               </div>
-              {pollOptions.length < 5 && (
+              {pollOptions.length < 10 && (
                 <button type="button" onClick={addPollOption} className="mt-3 text-xs text-orange-400 font-medium flex items-center gap-1 hover:text-orange-300">
                   <Plus size={14} /> Adicionar Opção
                 </button>
