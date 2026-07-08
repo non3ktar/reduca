@@ -144,6 +144,29 @@
     --text-color: #f5f8fc;
   }
 
+  /* Tema Cora Coralina */
+  body.theme-coralina {
+    --color-orange-300: #f0a868;
+    --color-orange-400: #e88d3e;
+    --color-orange-500: #d35400; /* Doce Cristalizado / Abóbora */
+    --color-orange-600: #a84300;
+    
+    --color-slate-950: #292421; /* Terra / Pedras da Casa Velha */
+    --color-slate-900: #292421;
+    --color-slate-800: #3d3531; /* Marrom Acinzentado */
+    --color-slate-700: #594f49;
+    --color-slate-600: #7d7069;
+    --color-slate-500: #a3958c;
+    --color-slate-400: #c9bcaf;
+    --color-slate-300: #dfd5cb;
+    --color-slate-200: #ede6e0;
+    --color-slate-100: #f7f3f0;
+    --color-slate-50: #fdfbf9;
+
+    --bg-color: #292421;
+    --text-color: #fdfbf9;
+  }
+
 
   body {
     background-color: var(--bg-color);

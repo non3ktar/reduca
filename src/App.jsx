@@ -120,7 +120,7 @@ export default function App() {
     // Global Educational Theme
     let currentGlobalTheme = 'default';
     const applyGlobalTheme = (themeName) => {
-      document.body.classList.remove('theme-freire', 'theme-anisio', 'theme-mahin', 'theme-patativa', 'theme-felipa');
+      document.body.classList.remove('theme-freire', 'theme-anisio', 'theme-mahin', 'theme-patativa', 'theme-felipa', 'theme-coralina');
       if (themeName && themeName !== 'default') {
         document.body.classList.add(themeName);
       }

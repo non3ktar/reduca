@@ -725,6 +725,17 @@ export default function Admin({ user }) {
                   <p className="text-xs text-slate-400">Vermelho, Branco e Azul Marinho. As cores da bandeira da Bahia.</p>
                 </button>
 
+                {/* Tema Cora Coralina */}
+                <button onClick={() => handleThemeChange('theme-coralina')} className={`p-4 rounded-xl border-2 text-left transition-all ${globalTheme === 'theme-coralina' ? 'border-[#d35400] bg-[#d35400]/10' : 'border-slate-700 hover:border-slate-500 bg-slate-900/50'}`}>
+                  <h3 className="font-bold text-slate-50 text-lg mb-2">Cora Coralina</h3>
+                  <div className="flex gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-[#d35400]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#f0a868]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#292421]"></div>
+                  </div>
+                  <p className="text-xs text-slate-400">Doce de Abóbora, Laranja Cristalizado e Casa Velha. A doçura e a terra.</p>
+                </button>
+
               </div>
             </div>
           </div>
