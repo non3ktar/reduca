@@ -29,6 +29,122 @@
     --text-color: #000000;
   }
 
+  /* Tema Paulo Freire */
+  body.theme-freire {
+    --color-orange-300: #e28743; /* Amarelo ouro */
+    --color-orange-400: #d06d2a;
+    --color-orange-500: #b94a2e; /* Terracota */
+    --color-orange-600: #a03a20;
+    
+    --color-slate-950: #e8e3d8; /* Papel cru fundo */
+    --color-slate-900: #e8e3d8;
+    --color-slate-800: #f4f1ea; /* Papel cru claro cards */
+    --color-slate-700: #d6cfb8;
+    --color-slate-600: #a39b85;
+    --color-slate-500: #7a735c;
+    --color-slate-400: #544d37;
+    --color-slate-300: #3d3725;
+    --color-slate-200: #292416;
+    --color-slate-100: #1a160d;
+    --color-slate-50: #0d0b07;
+
+    --bg-color: #e8e3d8;
+    --text-color: #292416;
+  }
+
+  /* Tema Anísio Teixeira */
+  body.theme-anisio {
+    --color-orange-300: #e5b300; /* Amarelo sóbrio */
+    --color-orange-400: #d4a600;
+    --color-orange-500: #1b4f72; /* Azul institucional */
+    --color-orange-600: #143d59;
+    
+    --color-slate-950: #d5d8dc; /* Cinza concreto fundo */
+    --color-slate-900: #d5d8dc;
+    --color-slate-800: #eaeded; /* Cinza concreto claro cards */
+    --color-slate-700: #b2babb;
+    --color-slate-600: #7f8c8d;
+    --color-slate-500: #616a6b;
+    --color-slate-400: #424949;
+    --color-slate-300: #2c3e50;
+    --color-slate-200: #212f3c;
+    --color-slate-100: #17202a;
+    --color-slate-50: #11181f;
+
+    --bg-color: #d5d8dc;
+    --text-color: #212f3c;
+  }
+
+  /* Tema Luísa Mahin */
+  body.theme-mahin {
+    --color-orange-300: #f1c40f; /* Dourado */
+    --color-orange-400: #e67e22;
+    --color-orange-500: #c0392b; /* Vermelho forte */
+    --color-orange-600: #922b21;
+    
+    --color-slate-950: #0b0c10; /* Preto profundo fundo */
+    --color-slate-900: #0b0c10;
+    --color-slate-800: #1f2833; /* Cinza escuro cards */
+    --color-slate-700: #273746;
+    --color-slate-600: #4d5656;
+    --color-slate-500: #7b7d7d;
+    --color-slate-400: #95a5a6;
+    --color-slate-300: #bdc3c7;
+    --color-slate-200: #d0d3d4;
+    --color-slate-100: #e5e8e8;
+    --color-slate-50: #f2f3f4;
+
+    --bg-color: #0b0c10;
+    --text-color: #e5e8e8;
+  }
+
+  /* Tema Patativa do Assaré */
+  body.theme-patativa {
+    --color-orange-300: #5dade2; /* Azul céu */
+    --color-orange-400: #52be80; /* Verde caatinga */
+    --color-orange-500: #e91e63; /* Rosa magenta cordel */
+    --color-orange-600: #c2185b;
+    
+    --color-slate-950: #dcb37b; /* Ocre claro fundo */
+    --color-slate-900: #dcb37b;
+    --color-slate-800: #ebd6b7; /* Ocre mais claro cards */
+    --color-slate-700: #c4995b;
+    --color-slate-600: #9c733a;
+    --color-slate-500: #785422;
+    --color-slate-400: #543912;
+    --color-slate-300: #3b280d;
+    --color-slate-200: #211607;
+    --color-slate-100: #120b02;
+    --color-slate-50: #080501;
+
+    --bg-color: #dcb37b;
+    --text-color: #211607;
+  }
+
+  /* Tema Maria Felipa */
+  body.theme-felipa {
+    --color-orange-300: #ef5350; /* Vermelho claro */
+    --color-orange-400: #f44336;
+    --color-orange-500: #e53935; /* Vermelho Bandeira da Bahia */
+    --color-orange-600: #c62828;
+    
+    --color-slate-950: #0a1931; /* Azul Marinho Profundo */
+    --color-slate-900: #0a1931;
+    --color-slate-800: #15294a; /* Azul Royal escuro para cards */
+    --color-slate-700: #1e3a68;
+    --color-slate-600: #2d5594;
+    --color-slate-500: #4673bc;
+    --color-slate-400: #93aedb;
+    --color-slate-300: #c4d4eb;
+    --color-slate-200: #e6edf7;
+    --color-slate-100: #f5f8fc;
+    --color-slate-50: #ffffff; /* Branco Neve */
+
+    --bg-color: #0a1931;
+    --text-color: #f5f8fc;
+  }
+
+
   body {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -49,7 +165,7 @@
 }
 
 body.light-theme .glass {
-  @apply bg-white/50 border-black/5;
+  @apply bg-slate-800/50 border-black/5;
 }
 
 .glass-card {
@@ -57,7 +173,7 @@ body.light-theme .glass {
 }
 
 body.light-theme .glass-card {
-  @apply bg-white/70 border-black/10;
+  @apply bg-slate-800/70 border-black/10;
 }
 
 .glass-input {
@@ -65,5 +181,5 @@ body.light-theme .glass-card {
 }
 
 body.light-theme .glass-input {
-  @apply bg-white/60 border-black/20 text-black focus:ring-black;
+  @apply bg-slate-700/50 border-black/20 text-slate-900 focus:ring-black;
 }

@@ -117,7 +117,30 @@ export default function App() {
       document.body.classList.remove('light-theme');
     }
 
-    return () => subscription.unsubscribe();
+    // Global Educational Theme
+    let currentGlobalTheme = 'default';
+    const applyGlobalTheme = (themeName) => {
+      document.body.classList.remove('theme-freire', 'theme-anisio', 'theme-mahin', 'theme-patativa', 'theme-felipa');
+      if (themeName && themeName !== 'default') {
+        document.body.classList.add(themeName);
+      }
+      currentGlobalTheme = themeName;
+    };
+
+    supabase.from('platform_settings').select('value').eq('id', 'global_theme').single().then(({ data }) => {
+      if (data) applyGlobalTheme(data.value);
+    }).catch(() => {});
+
+    const themeChannel = supabase.channel('global-theme-channel')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings', filter: "id=eq.global_theme" }, payload => {
+        if (payload.new && payload.new.value) applyGlobalTheme(payload.new.value);
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      supabase.removeChannel(themeChannel);
+    };
   }, []);
 
   useEffect(() => {

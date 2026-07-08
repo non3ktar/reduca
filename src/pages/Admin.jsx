@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
-import { ShieldAlert, ArrowLeft, Plus, Trash2, Users, LayoutDashboard, Settings, UserCheck, UserX, BadgeCheck, Star, X, Download, Mail } from 'lucide-react';
+import { ShieldAlert, ArrowLeft, Plus, Trash2, Users, LayoutDashboard, Settings, UserCheck, UserX, BadgeCheck, Star, X, Download, Mail, Palette } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 
@@ -17,6 +17,7 @@ export default function Admin({ user }) {
   const [leads, setLeads] = useState([]);
   const [showAppModal, setShowAppModal] = useState(false);
   const [newApp, setNewApp] = useState({ name: '', description: '', icon_url: '', link_web: '', link_apk: '', link_desktop: '' });
+  const [globalTheme, setGlobalTheme] = useState('default');
 
   // Modal de Widgets
   const [showWidgetModal, setShowWidgetModal] = useState(false);
@@ -55,15 +56,21 @@ export default function Admin({ user }) {
     if (data) setLeads(data);
   };
 
+  const fetchGlobalTheme = async () => {
+    const { data } = await supabase.from('platform_settings').select('value').eq('id', 'global_theme').single();
+    if (data) setGlobalTheme(data.value);
+  };
+
   useEffect(() => {
     // Check if user is admin
     supabase.from('profiles').select('is_admin').eq('id', user.id).single().then(({ data }) => {
       if (data && data.is_admin) {
         setIsAdmin(true);
-        fetchGlobalWidgets();
         fetchUsers();
+        fetchGlobalWidgets();
         fetchEcosystemApps();
         fetchLeads();
+        fetchGlobalTheme();
       }
       setLoading(false);
     });
@@ -208,7 +215,12 @@ export default function Admin({ user }) {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-orange-500 font-bold">Verificando credenciais...</div>;
+  const handleThemeChange = async (theme) => {
+    setGlobalTheme(theme);
+    await supabase.from('platform_settings').upsert({ id: 'global_theme', value: theme });
+  };
+
+  if (loading) return <div className="min-h-screen bg-slate-950 flex items-center justify-center text-orange-500 font-bold">Verificando acessos...</div>;
 
   if (!isAdmin) {
     return (
@@ -262,7 +274,13 @@ export default function Admin({ user }) {
             onClick={() => setActiveTab('leads')} 
             className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'leads' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-600'}`}
           >
-            <Mail size={18} /> Contatos (Leads)
+            <Mail size={18} /> Leads & Waitlist
+          </button>
+          <button 
+            onClick={() => setActiveTab('temas')} 
+            className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'temas' ? 'border-orange-500 text-orange-400' : 'border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-600'}`}
+          >
+            <Palette size={18} /> Temas do Reduca
           </button>
         </div>
 
@@ -628,6 +646,85 @@ export default function Admin({ user }) {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Temas */}
+        {activeTab === 'temas' && (
+          <div className="space-y-6">
+            <div className="glass-card p-6 border border-slate-700/50">
+              <h2 className="text-xl font-bold text-slate-200 mb-2 flex items-center gap-2"><Palette className="text-orange-500" /> Temas Educacionais (Global)</h2>
+              <p className="text-sm text-slate-400 mb-6">Escolha o tema que será aplicado para <b>todos os usuários</b> da rede educacional instantaneamente.</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                {/* Tema Padrão */}
+                <button onClick={() => handleThemeChange('default')} className={`p-4 rounded-xl border-2 text-left transition-all ${globalTheme === 'default' ? 'border-orange-500 bg-orange-500/10' : 'border-slate-700 hover:border-slate-500 bg-slate-900/50'}`}>
+                  <h3 className="font-bold text-slate-50 text-lg mb-2">Original (Padrão)</h3>
+                  <div className="flex gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-[#f97316]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#020617] border border-slate-700"></div>
+                  </div>
+                  <p className="text-xs text-slate-400">Laranja vibrante e Âmbar. Focado em energia e criatividade.</p>
+                </button>
+
+                {/* Tema Paulo Freire */}
+                <button onClick={() => handleThemeChange('theme-freire')} className={`p-4 rounded-xl border-2 text-left transition-all ${globalTheme === 'theme-freire' ? 'border-[#b94a2e] bg-[#b94a2e]/10' : 'border-slate-700 hover:border-slate-500 bg-slate-900/50'}`}>
+                  <h3 className="font-bold text-slate-50 text-lg mb-2">Paulo Freire</h3>
+                  <div className="flex gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-[#b94a2e]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#e28743]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#e8e3d8]"></div>
+                  </div>
+                  <p className="text-xs text-slate-400">Terracota, Ouro e Branco de papel cru. Pedagogia da Esperança.</p>
+                </button>
+
+                {/* Tema Anísio Teixeira */}
+                <button onClick={() => handleThemeChange('theme-anisio')} className={`p-4 rounded-xl border-2 text-left transition-all ${globalTheme === 'theme-anisio' ? 'border-[#1b4f72] bg-[#1b4f72]/10' : 'border-slate-700 hover:border-slate-500 bg-slate-900/50'}`}>
+                  <h3 className="font-bold text-slate-50 text-lg mb-2">Anísio Teixeira</h3>
+                  <div className="flex gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-[#1b4f72]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#e5b300]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#d5d8dc]"></div>
+                  </div>
+                  <p className="text-xs text-slate-400">Azul Institucional, Cinza Concreto e Amarelo Sóbrio. Arquitetura escolar.</p>
+                </button>
+
+                {/* Tema Luísa Mahin */}
+                <button onClick={() => handleThemeChange('theme-mahin')} className={`p-4 rounded-xl border-2 text-left transition-all ${globalTheme === 'theme-mahin' ? 'border-[#c0392b] bg-[#c0392b]/10' : 'border-slate-700 hover:border-slate-500 bg-slate-900/50'}`}>
+                  <h3 className="font-bold text-slate-50 text-lg mb-2">Luísa Mahin</h3>
+                  <div className="flex gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-[#c0392b]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#f1c40f]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#0b0c10]"></div>
+                  </div>
+                  <p className="text-xs text-slate-400">Vermelho, Dourado e Preto Profundo. Resistência e dignidade.</p>
+                </button>
+
+                {/* Tema Patativa */}
+                <button onClick={() => handleThemeChange('theme-patativa')} className={`p-4 rounded-xl border-2 text-left transition-all ${globalTheme === 'theme-patativa' ? 'border-[#e91e63] bg-[#e91e63]/10' : 'border-slate-700 hover:border-slate-500 bg-slate-900/50'}`}>
+                  <h3 className="font-bold text-slate-50 text-lg mb-2">Patativa do Assaré</h3>
+                  <div className="flex gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-[#e91e63]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#5dade2]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#dcb37b]"></div>
+                  </div>
+                  <p className="text-xs text-slate-400">Rosa-magenta, Azul Céu e Ocre do Sertão. Poesia de cordel.</p>
+                </button>
+
+                {/* Tema Maria Felipa */}
+                <button onClick={() => handleThemeChange('theme-felipa')} className={`p-4 rounded-xl border-2 text-left transition-all ${globalTheme === 'theme-felipa' ? 'border-[#e53935] bg-[#e53935]/10' : 'border-slate-700 hover:border-slate-500 bg-slate-900/50'}`}>
+                  <h3 className="font-bold text-slate-50 text-lg mb-2">Maria Felipa</h3>
+                  <div className="flex gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-[#e53935]"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#ffffff] border border-slate-700"></div>
+                    <div className="w-6 h-6 rounded-full bg-[#0a1931]"></div>
+                  </div>
+                  <p className="text-xs text-slate-400">Vermelho, Branco e Azul Marinho. As cores da bandeira da Bahia.</p>
+                </button>
+
               </div>
             </div>
           </div>

@@ -232,3 +232,17 @@ create policy "Users can update own notifications." on public.notifications for 
 create policy "Authenticated users can insert notifications." on public.notifications for insert with check (auth.role() = 'authenticated');
 create policy "Users can delete own notifications." on public.notifications for delete using (auth.uid() = user_id);
 alter publication supabase_realtime add table public.notifications;
+
+-- 11. Platform Settings (Global Themes)
+create table public.platform_settings (
+  id text primary key,
+  value text not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.platform_settings enable row level security;
+create policy "Settings viewable by everyone." on public.platform_settings for select using (true);
+create policy "Settings modifiable by admin." on public.platform_settings for all using (
+  exists (select 1 from public.profiles where id = auth.uid() and (role = 'admin' or is_admin = true))
+);
+alter publication supabase_realtime add table public.platform_settings;
