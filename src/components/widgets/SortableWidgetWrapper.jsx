@@ -21,10 +21,10 @@ export default function SortableWidgetWrapper({ id, children, isAdmin }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} className={`group relative ${isDragging ? 'opacity-60 scale-105 z-50 drop-shadow-2xl' : ''}`}>
+    <div ref={setNodeRef} style={style} className={`group/widget relative ${isDragging ? 'opacity-60 scale-105 z-50 drop-shadow-2xl' : ''}`}>
       {isAdmin && (
         <div 
-          className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-600 rounded-full px-3 py-1 cursor-grab active:cursor-grabbing text-slate-400 hover:text-white hover:bg-orange-500 hover:border-orange-400 z-50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center shadow-lg"
+          className="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-600 rounded-full px-3 py-1 cursor-grab active:cursor-grabbing text-slate-400 hover:text-white hover:bg-orange-500 hover:border-orange-400 z-50 opacity-0 group-hover/widget:opacity-100 transition-all flex items-center justify-center shadow-lg"
           {...attributes}
           {...listeners}
           title="Arrastar para reordenar"
