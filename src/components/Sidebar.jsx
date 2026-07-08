@@ -10,13 +10,17 @@ import WidgetLibriVox from './widgets/WidgetLibriVox';
 import { AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Smartphone, Download } from 'lucide-react';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import SortableWidgetWrapper from './widgets/SortableWidgetWrapper';
 
 export default function Sidebar({ currentUser, className = 'hidden md:block' }) {
   const navigate = useNavigate();
-  const [activeWidgets, setActiveWidgets] = useState(['quem-seguir']);
+  const [activeWidgets, setActiveWidgets] = useState(['calendario', 'noticias', 'librivox', 'avisos', 'tarefas', 'quem-seguir']);
   const [customWidgets, setCustomWidgets] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userProfile, setUserProfile] = useState(currentUser);
+  const [configUserId, setConfigUserId] = useState(null);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -38,49 +42,111 @@ export default function Sidebar({ currentUser, className = 'hidden md:block' }) 
         // (Assumindo que apenas o admin teve acesso ao marketplace recentemente)
         supabase.from('custom_widgets').select('user_id').limit(1).single().then(({ data: customData }) => {
            const fallbackUserId = customData ? customData.user_id : currentUser.id;
+           setConfigUserId(fallbackUserId);
            loadWidgetsForUser(fallbackUserId);
         });
       } else {
-        const configUserId = adminData ? adminData.id : currentUser.id;
-        loadWidgetsForUser(configUserId);
+        const adminUserId = adminData ? adminData.id : currentUser.id;
+        setConfigUserId(adminUserId);
+        loadWidgetsForUser(adminUserId);
       }
     });
 
     function loadWidgetsForUser(userId) {
       supabase.from('user_settings').select('active_widgets').eq('user_id', userId).single().then(({ data }) => {
-        if (data && Array.isArray(data.active_widgets)) setActiveWidgets(data.active_widgets);
+        if (data && Array.isArray(data.active_widgets)) {
+          let widgets = data.active_widgets;
+          const fixed = ['calendario', 'noticias', 'librivox', 'avisos', 'tarefas'];
+          const missing = fixed.filter(f => !widgets.includes(f));
+          if (missing.length > 0) {
+            widgets = [...missing, ...widgets];
+          }
+          // Filtra widgets que agora pertencem apenas à barra lateral esquerda (no Home)
+          widgets = widgets.filter(id => !['quem-seguir', 'aniversarios', 'artigos'].includes(id));
+          setActiveWidgets(widgets);
+        }
       });
 
       supabase.from('custom_widgets').select('*').eq('user_id', userId).then(({ data }) => {
         if (data) setCustomWidgets(data);
       });
+
+      const channel = supabase.channel(`realtime-sidebar-${userId}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'user_settings', filter: `user_id=eq.${userId}` }, payload => {
+          if (payload.new && Array.isArray(payload.new.active_widgets)) {
+            let widgets = payload.new.active_widgets;
+            const fixed = ['calendario', 'noticias', 'librivox', 'avisos', 'tarefas'];
+            const missing = fixed.filter(f => !widgets.includes(f));
+            if (missing.length > 0) widgets = [...missing, ...widgets];
+            widgets = widgets.filter(id => !['quem-seguir', 'aniversarios', 'artigos'].includes(id));
+            setActiveWidgets(widgets);
+          }
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
 
   }, [currentUser]);
 
+  const handleDragEndRight = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    
+    if (!isAdmin || !configUserId) return;
+
+    const oldIndex = activeWidgets.indexOf(active.id);
+    const newIndex = activeWidgets.indexOf(over.id);
+    const newOrder = arrayMove(activeWidgets, oldIndex, newIndex);
+    
+    setActiveWidgets(newOrder);
+
+    // Salva no perfil de configuração (do admin)
+    await supabase.from('user_settings').upsert({ user_id: configUserId, active_widgets: newOrder });
+  };
+
+
   return (
     <aside className={`space-y-4 pb-24 md:pb-6 ${className}`}>
-      <WidgetCalendario currentUser={userProfile} isAdmin={isAdmin} />
-      <WidgetNoticias currentUser={userProfile} isAdmin={isAdmin} />
-      <WidgetLibriVox currentUser={userProfile} isAdmin={isAdmin} />
-      <WidgetAvisos />
-      <WidgetTarefas currentUser={userProfile} isAdmin={isAdmin} />
-      <AnimatePresence>
-        {activeWidgets.filter(id => !['quem-seguir', 'aniversarios', 'calendario', 'noticias', 'avisos', 'tarefas', 'artigos'].includes(id)).map(widgetId => {
-          const WidgetDefinition = availableWidgets.find(w => w.id === widgetId);
-          if (WidgetDefinition) {
-            const WidgetComponent = WidgetDefinition.component;
-            return <WidgetComponent key={widgetId} currentUser={userProfile} isAdmin={isAdmin} />;
-          }
-          
-          const customWidget = customWidgets?.find(cw => cw.id === widgetId);
-          if (customWidget) {
-            return <WidgetCustom key={widgetId} widgetData={customWidget} />;
-          }
-          
-          return null;
-        })}
-      </AnimatePresence>
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEndRight}>
+        <SortableContext items={activeWidgets} strategy={verticalListSortingStrategy}>
+          <AnimatePresence>
+            {activeWidgets.map(widgetId => {
+              // Verifica widgets nativos
+              if (widgetId === 'calendario') return <SortableWidgetWrapper key={widgetId} id={widgetId} isAdmin={isAdmin}><WidgetCalendario currentUser={userProfile} isAdmin={isAdmin} /></SortableWidgetWrapper>;
+              if (widgetId === 'noticias') return <SortableWidgetWrapper key={widgetId} id={widgetId} isAdmin={isAdmin}><WidgetNoticias currentUser={userProfile} isAdmin={isAdmin} /></SortableWidgetWrapper>;
+              if (widgetId === 'librivox') return <SortableWidgetWrapper key={widgetId} id={widgetId} isAdmin={isAdmin}><WidgetLibriVox currentUser={userProfile} isAdmin={isAdmin} /></SortableWidgetWrapper>;
+              if (widgetId === 'avisos') return <SortableWidgetWrapper key={widgetId} id={widgetId} isAdmin={isAdmin}><WidgetAvisos /></SortableWidgetWrapper>;
+              if (widgetId === 'tarefas') return <SortableWidgetWrapper key={widgetId} id={widgetId} isAdmin={isAdmin}><WidgetTarefas currentUser={userProfile} isAdmin={isAdmin} /></SortableWidgetWrapper>;
+
+              // Verifica disponíveis no registry
+              const WidgetDefinition = availableWidgets.find(w => w.id === widgetId);
+              if (WidgetDefinition) {
+                const WidgetComponent = WidgetDefinition.component;
+                return (
+                  <SortableWidgetWrapper key={widgetId} id={widgetId} isAdmin={isAdmin}>
+                    <WidgetComponent currentUser={userProfile} isAdmin={isAdmin} />
+                  </SortableWidgetWrapper>
+                );
+              }
+              
+              // Verifica customizados
+              const customWidget = customWidgets?.find(cw => cw.id === widgetId);
+              if (customWidget) {
+                return (
+                  <SortableWidgetWrapper key={widgetId} id={widgetId} isAdmin={isAdmin}>
+                    <WidgetCustom widgetData={customWidget} />
+                  </SortableWidgetWrapper>
+                );
+              }
+              
+              return null;
+            })}
+          </AnimatePresence>
+        </SortableContext>
+      </DndContext>
 
       {/* App Download Banner */}
       <div className="glass-card p-5 border border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-amber-500/5 relative overflow-hidden group mb-4">

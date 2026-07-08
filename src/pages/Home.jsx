@@ -18,6 +18,9 @@ import WidgetOnlyOffice from '../components/widgets/WidgetOnlyOffice';
 import { LogOut, Home as HomeIcon, Bell, MessageCircle, BookOpen, BadgeCheck, Users, CalendarDays, RefreshCcw, Mail, Gamepad2, Swords, GraduationCap, Gavel } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppDrawer from '../components/AppDrawer';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import SortableWidgetWrapper from '../components/widgets/SortableWidgetWrapper';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Download } from 'lucide-react';
@@ -29,6 +32,8 @@ export default function Home({ user }) {
   const [mobileTab, setMobileTab] = useState('feed');
   const [posts, setPosts] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const defaultLeftWidgets = ['onlyoffice', 'audiobook', 'online', 'membros', 'escambo', 'grupos', 'forum', 'artigos', 'quem-seguir', 'aniversarios'];
+  const [leftWidgets, setLeftWidgets] = useState(defaultLeftWidgets);
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
@@ -109,9 +114,35 @@ export default function Home({ user }) {
       })
       .subscribe();
 
+    // Fetch global left widgets
+    supabase.from('platform_settings').select('value').eq('id', 'global_left_widgets').single().then(({ data }) => {
+      if (data && data.value) {
+        try {
+          const parsed = JSON.parse(data.value);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setLeftWidgets(parsed);
+          }
+        } catch (e) {}
+      }
+    });
+
+    const channelSettings = supabase.channel('realtime-left-widgets')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'platform_settings', filter: "id=eq.global_left_widgets" }, payload => {
+        if (payload.new && payload.new.value) {
+          try {
+            const parsed = JSON.parse(payload.new.value);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setLeftWidgets(parsed);
+            }
+          } catch (e) {}
+        }
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
       supabase.removeChannel(channelNotif);
+      supabase.removeChannel(channelSettings);
     };
   }, [user]);
 
@@ -127,6 +158,23 @@ export default function Home({ user }) {
     if (notif.link) {
       window.location.href = notif.link; // Usando window.location para forçar reload e garantir navegação
     }
+  };
+
+  const handleDragEndLeft = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    
+    if (!userData?.is_admin) return;
+
+    const oldIndex = leftWidgets.indexOf(active.id);
+    const newIndex = leftWidgets.indexOf(over.id);
+    const newOrder = arrayMove(leftWidgets, oldIndex, newIndex);
+    
+    setLeftWidgets(newOrder);
+
+    // Salvar no Supabase (se a linha já existir atualiza, se não, dá erro, então vamos usar upsert ou um RPC se houver)
+    // Usando upsert para garantir que insira se não existir
+    await supabase.from('platform_settings').upsert({ id: 'global_left_widgets', value: JSON.stringify(newOrder) });
   };
 
   const handleManualUpdateCheck = async () => {
@@ -158,6 +206,22 @@ export default function Home({ user }) {
   };
 
   if (!userData) return null;
+
+  const renderLeftWidget = (id) => {
+    switch(id) {
+      case 'onlyoffice': return <WidgetOnlyOffice />;
+      case 'audiobook': return <WidgetAudiobook currentUser={userData} isAdmin={userData?.is_admin} />;
+      case 'online': return <WidgetOnline />;
+      case 'membros': return <WidgetMembros />;
+      case 'escambo': return <WidgetEscambo />;
+      case 'grupos': return <WidgetGrupos />;
+      case 'forum': return <WidgetForum />;
+      case 'artigos': return <WidgetArtigos isAdmin={userData?.is_admin} />;
+      case 'quem-seguir': return <WidgetQuemSeguir currentUser={userData} isAdmin={userData?.is_admin} />;
+      case 'aniversarios': return <WidgetAniversarios currentUser={userData} isAdmin={userData?.is_admin} />;
+      default: return null;
+    }
+  };
 
   return (
     <div className="min-h-screen pb-20 md:pb-0 md:pt-20">
@@ -241,16 +305,15 @@ export default function Home({ user }) {
       <main className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 md:grid-cols-[minmax(0,600px)_320px] lg:grid-cols-[280px_minmax(0,600px)_320px] justify-center gap-6">
         {/* Left Sidebar (Desktop & Mobile "pessoas" tab) */}
         <aside className={`lg:block space-y-4 pb-6 lg:h-fit lg:sticky lg:bottom-4 ${mobileTab === 'pessoas' ? 'block' : 'hidden'}`}>
-          <WidgetOnlyOffice />
-          <WidgetAudiobook currentUser={userData} isAdmin={userData?.is_admin} />
-          <WidgetOnline />
-          <WidgetMembros />
-          <WidgetEscambo />
-          <WidgetGrupos />
-          <WidgetForum />
-          <WidgetArtigos isAdmin={userData?.is_admin} />
-          <WidgetQuemSeguir currentUser={userData} isAdmin={userData?.is_admin} />
-          <WidgetAniversarios currentUser={userData} isAdmin={userData?.is_admin} />
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEndLeft}>
+            <SortableContext items={leftWidgets} strategy={verticalListSortingStrategy}>
+              {leftWidgets.map(id => (
+                <SortableWidgetWrapper key={id} id={id} isAdmin={userData?.is_admin}>
+                  {renderLeftWidget(id)}
+                </SortableWidgetWrapper>
+              ))}
+            </SortableContext>
+          </DndContext>
         </aside>
 
         <div className={`space-y-6 ${mobileTab === 'feed' ? 'block' : 'hidden'} md:block`}>
